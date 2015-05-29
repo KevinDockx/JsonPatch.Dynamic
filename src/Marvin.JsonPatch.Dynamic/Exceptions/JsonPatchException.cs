@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marvin.JsonPatch.Exceptions
+namespace Marvin.JsonPatch.Dynamic.Exceptions
 {
     public class JsonPatchException : Exception
     {
