@@ -20,7 +20,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic obj = new
             {
                 Test = 1
-            };
+            }; 
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
