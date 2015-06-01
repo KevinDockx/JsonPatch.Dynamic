@@ -1,5 +1,7 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿using Marvin.JsonPatch.Dynamic.Helpers;
+using Marvin.JsonPatch.Exceptions;
 using Marvin.JsonPatch.Operations;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
          
         public void Add(Operation operation, dynamic objectToApplyTo)
         {
+            operation.path = operation.path.ToLower();
            Add(operation.path, operation.value, objectToApplyTo, operation);
         }
 
@@ -43,27 +46,51 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             var actualPathToProperty = path;
 
             var propertyDictionary = (IDictionary<String, Object>)(objectToApplyTo);
-            propertyDictionary.Add(path, value);
-             
+          //  propertyDictionary.Add(path, value);
 
-            //if (path.EndsWith("/-"))
-            //{
-            //    appendList = true;
-            //    actualPathToProperty = path.Substring(0, path.Length - 2);
-            //}
-            //else
-            //{
-            //    positionAsInteger = PropertyHelpers.GetNumericEnd(path);
 
-            //    if (positionAsInteger > -1)
-            //    {
-            //        actualPathToProperty = path.Substring(0,
-            //            path.IndexOf('/' + positionAsInteger.ToString()));
-            //    }
-            //}
+            if (path.EndsWith("/-"))
+            {
+                appendList = true;
+                actualPathToProperty = path.Substring(0, path.Length - 2);
+            }
+            else
+            {
+                positionAsInteger = DynamicPropertyHelpers.GetNumericEnd(path);
 
-            //var pathProperty = PropertyHelpers
-            //    .FindProperty(objectToApplyTo, actualPathToProperty);
+                if (positionAsInteger > -1)
+                {
+                    actualPathToProperty = path.Substring(0,
+                        path.IndexOf('/' + positionAsInteger.ToString()));
+                }
+            }
+
+            // we need to check if the property at the path already exists, and if 
+            // it doesn't exist, we need to create it.            
+
+            var containerDictionary = DynamicPropertyHelpers
+                .FindOrCreateContainerDictionary(propertyDictionary, actualPathToProperty);
+ 
+            // add the value to the container dictionary.  We must ensure this value
+            // is an ExpandoObject as well  TODO - serialize here, or use custom jsonconverter 
+            // for performance?
+
+
+            string finalPath = actualPathToProperty.Split('/').Last();
+            if (containerDictionary.ContainsKey(finalPath))
+            {
+                containerDictionary[finalPath] = value;
+            }
+            else
+            {
+                // add it.  
+                //dynamic valueAsExpandoObject = JsonConvert.DeserializeObject<ExpandoObject>
+                //    (JsonConvert.SerializeObject(value));
+
+                containerDictionary.Add(finalPath, value);
+
+            }
+
 
             //// does property at path exist?
             //if (pathProperty == null)

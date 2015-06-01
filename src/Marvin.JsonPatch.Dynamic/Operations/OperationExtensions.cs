@@ -11,9 +11,40 @@ namespace Marvin.JsonPatch.Dynamic.Operations
 {
     public static class OperationExtensions
     {
-        public static void Apply(this Operation operation, dynamic dynamic, IDynamicObjectAdapter adapter)
+        public static void Apply(this Operation operation, dynamic objectToApplyTo, IDynamicObjectAdapter adapter)
         {
-            // todo
+            if (objectToApplyTo == null)
+            {
+                throw new NullReferenceException("objectToApplyTo cannot be null");
+            }
+            if (adapter == null)
+            {
+                throw new NullReferenceException("adapter cannot be null");
+            }
+
+            switch (operation.OperationType)
+            {
+                case OperationType.Add:
+                    adapter.Add(operation, objectToApplyTo);
+                    break;
+                //case OperationType.Remove:
+                //    adapter.Remove(this, objectToApplyTo);
+                //    break;
+                //case OperationType.Replace:
+                //    adapter.Replace(this, objectToApplyTo);
+                //    break;
+                //case OperationType.Move:
+                //    adapter.Move(this, objectToApplyTo);
+                //    break;
+                //case OperationType.Copy:
+                //    adapter.Copy(this, objectToApplyTo);
+                //    break;
+                //case OperationType.Test:
+                //    adapter.Test(this, objectToApplyTo);
+                //    break;
+                default:
+                    break;
+            }
         }
     }
 }
