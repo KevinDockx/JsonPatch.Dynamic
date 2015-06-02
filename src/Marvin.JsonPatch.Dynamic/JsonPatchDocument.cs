@@ -9,6 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Marvin.JsonPatch.Dynamic.Adapters;
+using System.Linq.Expressions;
+using Marvin.JsonPatch.Dynamic.Helpers;
 
 namespace Marvin.JsonPatch.Dynamic
 {
@@ -33,10 +35,18 @@ namespace Marvin.JsonPatch.Dynamic
 
         public JsonPatchDocument Add<TProp>(string path, TProp value)
         {
-            Operations.Add(new Operation("add",path.ToLower(), null, value));
+            Operations.Add(new Operation("add", path, null, value));
             return this;
         }
 
+
+        public JsonPatchDocument Add<TProp>(string path, TProp value, int position)
+        {
+            Operations.Add(new Operation("add", path + "/" + position, null, value));
+            return this;
+        }
+
+         
 
         /// <summary>
         /// Apply the patch document, and return a new ExpandoObject (dynamic) with the change applied.

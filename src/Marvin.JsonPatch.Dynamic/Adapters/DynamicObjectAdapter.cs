@@ -18,8 +18,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
          
         public void Add(Operation operation, dynamic objectToApplyTo)
         {
-            operation.path = operation.path.ToLower();
-           Add(operation.path, operation.value, objectToApplyTo, operation);
+            Add(operation.path, operation.value, objectToApplyTo, operation);
         }
 
 
