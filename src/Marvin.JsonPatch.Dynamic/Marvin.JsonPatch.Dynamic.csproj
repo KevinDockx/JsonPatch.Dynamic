@@ -49,6 +49,7 @@
     <Compile Include="Adapters\DynamicObjectAdapter.cs" />
     <Compile Include="Adapters\IDynamicObjectAdapter.cs" />
     <Compile Include="Exceptions\JsonPatchException.cs" />
+    <Compile Include="Helpers\ConversionResult.cs" />
     <Compile Include="Helpers\DynamicPropertyHelpers.cs" />
     <Compile Include="JsonPatchDocument.cs" />
     <Compile Include="Operations\OperationExtensions.cs" />

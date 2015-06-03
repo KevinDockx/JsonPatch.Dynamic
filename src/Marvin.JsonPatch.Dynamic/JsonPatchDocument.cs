@@ -70,27 +70,29 @@ namespace Marvin.JsonPatch.Dynamic
             // nested objects are converted to expandoobjects as well, which is
             // required to manipulate them afterwards.
           
-            dynamic clonedObject = JsonConvert.DeserializeObject<ExpandoObject>
-                (JsonConvert.SerializeObject(objectToCreateNewObjectFrom));
+            // we cannot use JsonConvert's ExpandoObject cloning - that will
+            // remove all type information (if there is any)
+            //dynamic clonedObject = JsonConvert.DeserializeObject<ExpandoObject>
+            //    (JsonConvert.SerializeObject(objectToCreateNewObjectFrom));
 
-            //dynamic expandoObjectToApplyTo = new ExpandoObject();
-            //var propertyDictionary = (IDictionary<String, Object>)(expandoObjectToApplyTo);
+            dynamic expandoObjectToApplyTo = new ExpandoObject();
+            var propertyDictionary = (IDictionary<String, Object>)(expandoObjectToApplyTo);
 
-            //foreach (PropertyInfo propertyInfo in
-            //    objectToCreateNewObjectFrom.GetType().GetProperties())
-            //{
-            //    propertyDictionary[propertyInfo.Name] = propertyInfo.GetValue(objectToCreateNewObjectFrom, null);
-            //}
-             
+            foreach (PropertyInfo propertyInfo in
+                objectToCreateNewObjectFrom.GetType().GetProperties())
+            {
+                propertyDictionary[propertyInfo.Name] = propertyInfo.GetValue(objectToCreateNewObjectFrom, null);
+            }             
 
             // apply each operation in order
             foreach (var op in Operations)
-            {
-                op.Apply((ExpandoObject)clonedObject, adapter);
-               // op.Apply((ExpandoObject)expandoObjectToApplyTo, adapter);
+            {              
+                op.Apply((ExpandoObject)expandoObjectToApplyTo, adapter);
+
             }
 
-            return clonedObject;
+            return expandoObjectToApplyTo;
+             
 
         }
          

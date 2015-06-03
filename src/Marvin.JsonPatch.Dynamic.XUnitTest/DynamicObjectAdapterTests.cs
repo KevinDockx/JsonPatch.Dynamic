@@ -114,13 +114,12 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
 
-            var newObject = deserialized.CreateFrom(obj);
+            var result = deserialized.CreateFrom(obj);
 
-            Assert.Equal(valueToAdd.IntValue, newObject.ComplexProperty.IntValue);
-            Assert.Equal(valueToAdd.StringValue, newObject.ComplexProperty.StringValue);
-            Assert.Equal(valueToAdd.GuidValue, newObject.ComplexProperty.GuidValue);
-            Assert.Equal(1, newObject.Test);
-
+            Assert.Equal(valueToAdd.IntValue, result.ComplexProperty.IntValue);
+            Assert.Equal(valueToAdd.StringValue, result.ComplexProperty.StringValue);
+            Assert.Equal(valueToAdd.GuidValue, result.ComplexProperty.GuidValue);
+            Assert.Equal(1, result.Test); 
 
         }
  
@@ -143,7 +142,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var result = deserialized.CreateFrom(doc);
 
-            Assert.Equal("B", doc.StringProperty);
+            Assert.Equal("B", result.StringProperty);
 
         }
 
@@ -170,7 +169,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var result = deserialized.CreateFrom(doc);
 
-            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
+            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, result.IntegerList);
         }
 
  
@@ -218,8 +217,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var result = deserialized.CreateFrom(doc);
 
-            Assert.Equal(new List<int>() { 1, 2, 3, 4 }, doc.IntegerList);
-
+            Assert.Equal(new List<int>() { 1, 2, 3, 4 }, result.IntegerList);
 
         }
 
@@ -244,7 +242,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             
             var result = deserialized.CreateFrom(doc);
 
-            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
+            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, result.IntegerList);
 
 
         }
@@ -290,7 +288,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var result = deserialized.CreateFrom(doc);
 
-            Assert.Equal(new List<int>() { 1, 2, 3, 4 }, doc.IntegerList);
+            Assert.Equal(new List<int>() { 1, 2, 3, 4 }, result.IntegerList);
 
         }
 
