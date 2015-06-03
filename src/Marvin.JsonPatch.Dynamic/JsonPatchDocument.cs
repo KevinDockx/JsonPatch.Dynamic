@@ -39,8 +39,13 @@ namespace Marvin.JsonPatch.Dynamic
             return this;
         }
 
+        public JsonPatchDocument AddToArray<TProp>(string path, TProp value)
+        {
+            Operations.Add(new Operation("add", path + "/-", null, value));
+            return this;
+        }
 
-        public JsonPatchDocument Add<TProp>(string path, TProp value, int position)
+        public JsonPatchDocument AddToArray<TProp>(string path, TProp value, int position)
         {
             Operations.Add(new Operation("add", path + "/" + position, null, value));
             return this;
