@@ -45,9 +45,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             var actualPathToProperty = path;
 
             var propertyDictionary = (IDictionary<String, Object>)(objectToApplyTo);
-          //  propertyDictionary.Add(path, value);
-
-
+      
             if (path.EndsWith("/-"))
             {
                 appendList = true;
@@ -55,13 +53,27 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
             else
             {
-                positionAsInteger = DynamicPropertyHelpers.GetNumericEnd(path);
-
-                if (positionAsInteger > -1)
+                if (DynamicPropertyHelpers.HasNumericEnd(path))
                 {
-                    actualPathToProperty = path.Substring(0,
-                        path.IndexOf('/' + positionAsInteger.ToString()));
+                    positionAsInteger = DynamicPropertyHelpers.GetNumericEnd(path);
+
+                    if (positionAsInteger > -1)
+                    {
+                        actualPathToProperty = path.Substring(0,
+                            path.IndexOf('/' + positionAsInteger.ToString()));
+                    }
+                    else
+                    {
+                        // there is a numeric end to the path, BUT it's not valid =>
+                        // throw Exception
+                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                        string.Format("Patch failed: provided path is an invalid index for array property type at location path: {0}",
+                        path),
+                        objectToApplyTo, 422);
+
+                    }
                 }
+                
             }
 
             // we need to check if the property at the path already exists, and if 
@@ -71,7 +83,8 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 .FindOrCreateContainerDictionary(propertyDictionary, actualPathToProperty);
  
             // add the value to the container dictionary.  We must ensure this value
-            // is an ExpandoObject as well  TODO - serialize here, or use custom jsonconverter 
+            // is an ExpandoObject as well, as later operations might change properties
+            // on that object.  TODO - serialize here, or use custom jsonconverter 
             // for performance?
 
 
@@ -87,7 +100,9 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 if (appendList || positionAsInteger > -1)
                 {
                     // get the actual type
-                    var typeOfPathProperty = containerDictionary[finalPath].GetType();
+                    //  var typeOfPathProperty = containerDictionary[finalPath].GetType();
+
+                    var typeOfPathProperty = containerDictionary.GetValueForCaseInsensitiveKey(finalPath).GetType(); 
 
                     var isNonStringArray = !(typeOfPathProperty == typeof(string))
                         && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
@@ -108,12 +123,14 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         }
 
                         // get value (it can be cast, we just checked that)
-                        var array = containerDictionary[finalPath] as IList;
+                       // var array = containerDictionary[finalPath] as IList;
 
+                        var array = containerDictionary.GetValueForCaseInsensitiveKey(finalPath) as IList;
 
                         if (appendList)
                         {
                             array.Add(conversionResult.ConvertedInstance);
+                            containerDictionary.SetValueForCaseInsensitiveKey(finalPath, array);
                         }
                         else
                         {
@@ -122,6 +139,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             if (positionAsInteger <= array.Count)
                             {
                                 array.Insert(positionAsInteger, conversionResult.ConvertedInstance);
+                                containerDictionary.SetValueForCaseInsensitiveKey(finalPath, array);
                             }
                             else
                             {
