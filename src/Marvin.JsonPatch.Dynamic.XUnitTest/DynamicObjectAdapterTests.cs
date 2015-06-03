@@ -33,7 +33,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var newObject = deserialized.CreateFrom(obj);
 
-            Assert.Equal(1, newObject.newint);
+            Assert.Equal(1, newObject.NewInt);
             Assert.Equal(1, newObject.Test);
 
 
@@ -66,6 +66,61 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
         }
 
 
+        [Fact]
+        public void ShouldAddNewPropertyToNestedObjectInCamelCase()
+        {
+
+            dynamic obj = new
+            {
+
+                Test = 1,
+                Nested = new { }
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add<int>("Nested/newint", 1);
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+
+            var newObject = deserialized.CreateFrom(obj);
+
+            Assert.Equal(1, newObject.Nested.NewInt);
+            Assert.Equal(1, newObject.Test);
+
+        }
+
+
+
+        [Fact]
+        public void ShouldAddNewPropertyToNestedObjectInCamelCaseButKeepOriginalCase()
+        {
+
+            dynamic obj = new
+            {
+
+                Test = 1,
+                nested = new { }
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add<int>("Nested/newint", 1);
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+
+            var newObject = deserialized.CreateFrom(obj);
+
+            Assert.Equal(1, newObject.nested.NewInt);
+            Assert.Equal(1, newObject.Test);
+
+        }
+
+
 
         [Fact]
         public void AddNewNestedProperty()
@@ -88,10 +143,33 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(1, newObject.Nested.NewInt);
             Assert.Equal(1, newObject.Test);
-
-
+            
         }
 
+
+        [Fact]
+        public void ShouldAddNewNestedPropertyInCamelCase()
+        {
+
+            dynamic obj = new
+            {
+                Test = 1
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add("/nested/newint", 1);
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+
+            var newObject = deserialized.CreateFrom(obj);
+
+            Assert.Equal(1, newObject.Nested.NewInt);
+      
+
+        }
 
 
         [Fact]
@@ -147,6 +225,28 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
         }
 
 
+        [Fact]
+        public void ShouldReplacePropertyWithDifferentCase()
+        {
+            var doc = new
+            {
+                StringProperty = "A"
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add("stringproperty", "B");
+
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            var result = deserialized.CreateFrom(doc);
+
+            Assert.Equal("B", result.StringProperty);
+
+        }
+
      
 
 
@@ -172,7 +272,29 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, result.IntegerList);
         }
 
- 
+
+        [Fact]
+        public void ShouldAddToListWithDifferentCase()
+        {
+            var doc = new
+            {
+                IntegerList = new List<int>() { 1, 2, 3 }
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add("integerlist", 4, 0);
+
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+
+            var result = deserialized.CreateFrom(doc);
+
+            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, result.IntegerList);
+        }
+
 
 
 

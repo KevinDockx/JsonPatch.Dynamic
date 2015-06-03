@@ -76,7 +76,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
 
             string finalPath = actualPathToProperty.Split('/').Last();
-            if (containerDictionary.ContainsKey(finalPath))
+            if (containerDictionary.ContainsKeyCaseInsensitive(finalPath))
             {
                 // Existing property.  
                 // If it's not an array, we need to check if the value fits the property type
@@ -146,7 +146,10 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 else
                 {       
                     // get the actual type
-                    var typeOfPathProperty = containerDictionary[finalPath].GetType();
+
+                    var typeOfPathProperty = containerDictionary.GetValueForCaseInsensitiveKey(finalPath).GetType();
+
+                   // var typeOfPathProperty = containerDictionary[finalPath].GetType();
 
                     // can the value be converted to the actual type
                     var conversionResultTuple = 
@@ -155,7 +158,8 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     // conversion successful
                     if (conversionResultTuple.CanBeConverted)
                     {
-                        containerDictionary[finalPath] = conversionResultTuple.ConvertedInstance;
+                        containerDictionary.SetValueForCaseInsensitiveKey(finalPath, conversionResultTuple.ConvertedInstance);
+                        //containerDictionary[finalPath] = conversionResultTuple.ConvertedInstance;
                         //PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
                         //    conversionResultTuple.ConvertedInstance);
                     }

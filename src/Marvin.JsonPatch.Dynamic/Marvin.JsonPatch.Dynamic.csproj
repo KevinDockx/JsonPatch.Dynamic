@@ -51,6 +51,7 @@
     <Compile Include="Exceptions\JsonPatchException.cs" />
     <Compile Include="Helpers\ConversionResult.cs" />
     <Compile Include="Helpers\DynamicPropertyHelpers.cs" />
+    <Compile Include="Helpers\ExpandoObjectDictionaryExtensions.cs" />
     <Compile Include="JsonPatchDocument.cs" />
     <Compile Include="Operations\OperationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
