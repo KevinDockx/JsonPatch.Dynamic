@@ -67,7 +67,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
 
         [Fact]
-        public void ShouldAddNewPropertyToNestedObjectInCamelCase()
+        public void ShouldAddNewPropertyToNestedObjectInPascalCase()
         {
 
             dynamic obj = new
@@ -95,7 +95,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
 
         [Fact]
-        public void ShouldAddNewPropertyToNestedObjectInCamelCaseButKeepOriginalCase()
+        public void ShouldAddNewPropertyToNestedObjectInPascalCaseButKeepOriginalCase()
         {
 
             dynamic obj = new
@@ -148,7 +148,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
 
         [Fact]
-        public void ShouldAddNewNestedPropertyInCamelCase()
+        public void ShouldAddNewNestedPropertyInPascalCase()
         {
 
             dynamic obj = new
