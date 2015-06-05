@@ -72,16 +72,28 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         objectToApplyTo, 422);
 
                     }
-                }
-                
+                }                
             }
 
             // we need to check if the property at the path already exists, and if 
             // it doesn't exist, we need to create it.            
 
-            var containerDictionary = DynamicPropertyHelpers
+            var containerDictionary = propertyDictionary;
+
+            var createTreeResult = DynamicPropertyHelpers
                 .FindOrCreateContainerDictionary(propertyDictionary, actualPathToProperty);
- 
+
+            if (createTreeResult.CreatingIsAllowed)
+            {
+                containerDictionary = createTreeResult.CreatedTree;
+            }
+            else
+            {
+                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                            string.Format("Patch failed: provided path is invalid: {0}",
+                            path),
+                            objectToApplyTo, 422);
+            }
             // add the value to the container dictionary.  We must ensure this value
             // is an ExpandoObject as well, as later operations might change properties
             // on that object.  TODO - serialize here, or use custom jsonconverter 
