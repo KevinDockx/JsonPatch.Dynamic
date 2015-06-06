@@ -9,11 +9,11 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal class SetValueResult
     {
-        public bool CanSet { get; set; }
+        public bool CanSet { get; private set; }
 
-        public bool Success { get; set; }
+        public bool Success { get; private set; }
 
-        public PropertyInfo PropertyToSet { get; set; }
+        public PropertyInfo PropertyToSet { get; private set; }
 
         public SetValueResult(PropertyInfo propertyToSet, bool canSet, bool success)
         {

@@ -242,7 +242,23 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         }
 
                         // get value (it can be cast, we just checked that)
-                        var array = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty) as IList;
+                        var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
+
+                        IList array;
+
+                        if (getResult.CanGet)
+                        {
+                            array =  getResult.Value as IList;
+                        }
+                        else
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                string.Format("Patch failed: cannot get property value at path {0}.  Possible cause: the property doesn't have an accessible getter.",
+                                path),
+                                objectToApplyTo, 422);
+                        }
+
+                        
 
 
                         if (appendList)

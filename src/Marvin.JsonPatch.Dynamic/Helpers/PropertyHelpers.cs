@@ -21,7 +21,7 @@ namespace Marvin.JsonPatch.Helpers
     {
 
 
-        public static object GetValue(PropertyInfo propertyToGet, object targetObject, string pathToProperty)
+        public static GetValueResult GetValue(PropertyInfo propertyToGet, object targetObject, string pathToProperty)
         {
             // it is possible the path refers to a nested property.  In that case, we need to 
             // get from a different target object: the nested object.
@@ -38,8 +38,14 @@ namespace Marvin.JsonPatch.Helpers
                 targetObject = propertyInfoToGet.GetValue(targetObject, null);
             }
 
-
-            return propertyToGet.GetValue(targetObject, null);
+            if (propertyToGet.CanRead)
+            {
+                    return new GetValueResult(propertyToGet, true, propertyToGet.GetValue(targetObject, null), true);
+            }
+            else
+            {
+                return new GetValueResult(propertyToGet, false, null, false);
+            } 
         }
 
 
