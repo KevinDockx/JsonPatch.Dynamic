@@ -54,7 +54,7 @@ namespace Marvin.JsonPatch.Dynamic
 
         public void ApplyTo<T>(T objectToApplyTo)
         {
-            ApplyTo(objectToApplyTo, new MixedObjectAdapter());
+            ApplyTo(objectToApplyTo, new DynamicObjectAdapter());
         }
 
 
