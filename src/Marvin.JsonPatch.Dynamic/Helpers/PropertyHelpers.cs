@@ -45,7 +45,7 @@ namespace Marvin.JsonPatch.Helpers
 
 
 
-        public static bool SetValue(PropertyInfo propertyToSet, object targetObject, string pathToProperty, object value)
+        public static SetValueResult SetValue(PropertyInfo propertyToSet, object targetObject, string pathToProperty, object value)
         {
             // it is possible the path refers to a nested property.  In that case, we need to 
             // set on a different target object: the nested object.
@@ -63,12 +63,45 @@ namespace Marvin.JsonPatch.Helpers
                 targetObject = propertyInfoToGet.GetValue(targetObject, null);
             }
 
-
-            propertyToSet.SetValue(targetObject, value, null);
-
-            return true;
+            if (propertyToSet.CanWrite)
+            {
+                propertyToSet.SetValue(targetObject, value, null);
+                return new SetValueResult(propertyToSet, true, true);
+            }
+            else
+            {
+                return new SetValueResult(propertyToSet, false, true);
+            }
+                      
+             
         }
 
+
+        //public static object GetProperty(object o, string member)
+        //{
+        //    if (o == null) throw new ArgumentNullException("o");
+        //    if (member == null) throw new ArgumentNullException("member");
+        //    Type scope = o.GetType();
+        //    IDynamicMetaObjectProvider provider = o as IDynamicMetaObjectProvider;
+        //    if (provider != null)
+        //    {
+        //        ParameterExpression param = Expression.Parameter(typeof(object));
+        //        DynamicMetaObject mobj = provider.GetMetaObject(param);
+        //        GetMemberBinder binder = (GetMemberBinder)Microsoft.CSharp.RuntimeBinder.Binder.GetMember(0, member, scope, new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(0, null) });
+        //        DynamicMetaObject ret = mobj.BindGetMember(binder);
+        //        BlockExpression final = Expression.Block(
+        //            Expression.Label(CallSiteBinder.UpdateLabel),
+        //            ret.Expression
+        //        );
+        //        LambdaExpression lambda = Expression.Lambda(final, param);
+        //        Delegate del = lambda.Compile();
+        //        return del.DynamicInvoke(o);
+        //    }
+        //    else
+        //    {
+        //        return o.GetType().GetProperty(member, BindingFlags.Public | BindingFlags.Instance).GetValue(o, null);
+        //    }
+        //}
 
         public static PropertyInfo FindProperty(object targetObject, string propertyPath)
         {
@@ -84,6 +117,9 @@ namespace Marvin.JsonPatch.Helpers
                 {
                     var propertyInfoToGet = GetPropertyInfo(targetObject, splitPath[i]
                         , BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                    // todo: check if this targetobject is an expandoobject or not - if expando
+                    // (or IM
                     targetObject = propertyInfoToGet.GetValue(targetObject, null);
                 }
 

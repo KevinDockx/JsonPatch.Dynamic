@@ -40,6 +40,24 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             }
 
             throw new ArgumentException("Key not found in dictionary");
+        }
+
+        
+
+
+             internal static object GetValueForCaseInsensitiveKeyTest(this IDictionary<String, Object> propertyDictionary,
+          string key)
+        {
+            key = key.ToLower();
+            foreach (KeyValuePair<string, object> kvp in propertyDictionary)
+            {
+                if (kvp.Key.ToLower() == key)
+                {
+                    return kvp.Value;
+
+                }
+            }
+                 return null;
 
         }
 

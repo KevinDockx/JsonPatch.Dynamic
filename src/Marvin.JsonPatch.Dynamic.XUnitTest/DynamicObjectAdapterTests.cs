@@ -221,8 +221,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
         [Fact]
         public void AddComplexValueToExpandoObject()
-        {
-
+        { 
 
             dynamic doc = new ExpandoObject();
             doc.Test = 1; 
@@ -270,10 +269,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            deserialized.ApplyTo(doc);
 
-            Assert.Equal("B", doc.StringProperty);
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
 
+    
         }
 
 
@@ -303,6 +302,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
         public void AddResultsShouldReplaceInNested()
         {
             dynamic doc = new ExpandoObject();
+            doc.InBetweenFirst = new ExpandoObject();
+            doc.InBetweenFirst.InBetweenSecond = new ExpandoObject();
             doc.InBetweenFirst.InBetweenSecond.StringProperty = "A";
 
             // create patch
@@ -428,10 +429,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
         [Fact]
         public void ShouldReplacePropertyWithDifferentCase()
         {
-            var doc = new
-            {
-                StringProperty = "A"
-            };
+            dynamic doc = new ExpandoObject();
+            doc.StringProperty = "A";
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();

@@ -55,7 +55,9 @@
     <Compile Include="Helpers\DynamicPropertyHelpers.cs" />
     <Compile Include="Helpers\ExpandoObjectContainerResult.cs" />
     <Compile Include="Helpers\ExpandoObjectDictionaryExtensions.cs" />
+    <Compile Include="Helpers\ObjectTreeAnalysisResult.cs" />
     <Compile Include="Helpers\PropertyHelpers.cs" />
+    <Compile Include="Helpers\SetValueResult.cs" />
     <Compile Include="JsonPatchDocument.cs" />
     <Compile Include="Operations\OperationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

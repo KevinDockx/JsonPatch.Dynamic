@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Marvin.JsonPatch.Dynamic.Adapters
@@ -48,28 +49,125 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
 
 
-            var pathProperty = PropertyHelpers
-                .FindProperty(objectToApplyTo, actualPathToProperty);
+            var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty);
+
+            //var pathProperty = PropertyHelpers
+            //    .FindProperty(objectToApplyTo, actualPathToProperty);
 
 
-            // does property at path exist?
-            if (pathProperty == null)
+            if (result.UseDynamicLogic)
             {
-                // the propertyinfo does not exist.  This means the property truly doesn't 
-                // exist, or the pathproperty is in fact an ExpandoObject.
-                // This is where we need to add dynamic checks - if 
-                // the container is an ExpandoObject, we can add the property nevertheless.
+                if (result.IsValidPath)
+                { 
+                    if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInContainer))
+                    {
+                        // Existing property.  
+                        // If it's not an array, we need to check if the value fits the property type
+                        // 
+                        // If it's an array, we need to check if the value fits in that array type,
+                        // and add it at the correct position (if allowed).
 
-                // - find container
-                // - check if container is ExpandoObject
-                // - if it is, check if we can add the property (eg: the "root" = prop-1 must exist)
+                        if (appendList || positionAsInteger > -1)
+                        {
+                            // get the actual type
+                            //  var typeOfPathProperty = containerDictionary[finalPath].GetType();
 
-                var containerResult = DynamicPropertyHelpers.FindContainerForPath(objectToApplyTo, actualPathToProperty);
+                            var typeOfPathProperty = result.Container
+                                .GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
 
-                if (containerResult.IsValidContainer)
-                {
+                            var isNonStringArray = !(typeOfPathProperty == typeof(string))
+                                && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
 
-                    containerResult.Container.Add(containerResult.PathToPropertyInContainer, value);
+                            // what if it's an array but there's no position??
+                            if (isNonStringArray)
+                            {
+                                // now, get the generic type of the enumerable
+                                var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
+                                var conversionResult = DynamicPropertyHelpers.ConvertToActualType(genericTypeOfArray, value);
+
+                                if (!conversionResult.CanBeConverted)
+                                {
+                                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                      string.Format("Patch failed: provided value is invalid for array property type at location path: {0}",
+                                      path),
+                                      objectToApplyTo, 422);
+                                }
+
+                                // get value (it can be cast, we just checked that)
+                                // var array = containerDictionary[finalPath] as IList;
+
+                                var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer) as IList;
+
+                                if (appendList)
+                                {
+                                    array.Add(conversionResult.ConvertedInstance);
+                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                }
+                                else
+                                {
+                                    // specified index must not be greater than the amount of items in the
+                                    // array
+                                    if (positionAsInteger <= array.Count)
+                                    {
+                                        array.Insert(positionAsInteger, conversionResult.ConvertedInstance);
+                                        result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                    }
+                                    else
+                                    {
+                                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                   string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                   path),
+                                   objectToApplyTo, 422);
+                                    }
+                                }
+
+
+
+                            }
+                            else
+                            {
+                                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                   string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: expected array",
+                                   path),
+                                   objectToApplyTo, 422);
+                            }
+                        }
+                        else
+                        {
+                            // get the actual type
+
+                            var typeOfPathProperty = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
+
+                            // var typeOfPathProperty = containerDictionary[finalPath].GetType();
+
+                            // can the value be converted to the actual type
+                            var conversionResultTuple =
+                                DynamicPropertyHelpers.ConvertToActualType(typeOfPathProperty, value);
+
+                            // conversion successful
+                            if (conversionResultTuple.CanBeConverted)
+                            {
+                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, 
+                                    conversionResultTuple.ConvertedInstance);
+                            }
+                            else
+                            {
+                                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                string.Format("Patch failed: provided value is invalid for property type at location path: {0}",
+                                path),
+                                objectToApplyTo, 422);
+                            }
+
+                        }
+
+                    }
+                    else
+                    {
+                        // New property - add it.  
+                        result.Container.Add(result.PropertyPathInContainer, value);
+
+                    }
+                                       
                 }
                 else
                 {
@@ -80,6 +178,44 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
             else
             {
+                if (!result.IsValidPath)
+                {
+                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                      string.Format("Patch failed: the provided path is invalid: {0}.", path),
+                      objectToApplyTo, 422);
+                }
+
+                var pathProperty = result.PropertyInfo;
+
+
+            //// does property at path exist?
+            //if (pathProperty == null)
+            //{
+            //    // the propertyinfo does not exist.  This means the property truly doesn't 
+            //    // exist, or the pathproperty is in fact an ExpandoObject.
+            //    // This is where we need to add dynamic checks - if 
+            //    // the container is an ExpandoObject, we can add the property nevertheless.
+
+            //    // - find container
+            //    // - check if container is ExpandoObject
+            //    // - if it is, check if we can add the property (eg: the "root" = prop-1 must exist)
+
+            //    var containerResult = DynamicPropertyHelpers.FindContainerForPath(objectToApplyTo, actualPathToProperty);
+
+            //    if (containerResult.IsValidContainer)
+            //    {
+
+            //        containerResult.Container.Add(containerResult.PathToPropertyInContainer, value);
+            //    }
+            //    else
+            //    {
+            //        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+            //        string.Format("Patch failed: cannot add to the parent of the property at location path: {0}.  To be able to dynamically add properties, the parent must be an ExpandoObject.", path),
+            //        objectToApplyTo, 422);
+            //    }
+            //}
+            //else
+            //{
 
 
                 // it exists.  If it' an array, add to that array.  If it's not, we replace.
@@ -152,8 +288,16 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     // conversion successful
                     if (conversionResultTuple.CanBeConverted)
                     {
-                        PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
+                        var setResult = PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
                             conversionResultTuple.ConvertedInstance);
+
+                        if (!(setResult.CanSet))
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                           string.Format("Patch failed: property at path location cannot be set: {0}.  Possible causes: the property may not have an accessible setter, or the property may be part of an anonymous object (and thus cannot be changed after initialization).",
+                           path),
+                           objectToApplyTo, 422);
+                        }
                     }
                     else
                     {
