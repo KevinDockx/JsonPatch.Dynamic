@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +19,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
            
         public bool UseDynamicLogic { get; private set; }
 
-        public bool IsValidPath { get; private set; }
+        public bool IsValidPathForAdd { get; private set; }
+
+        public bool IsValidPathForRemove { get; private set; }
 
         public IDictionary<String, Object> Container { get; private set; }
         
@@ -72,14 +79,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                         // unless we're at the last item, we should set the targetobject
                         // to the new object.  If we're at the last item, we need to stop
                         if (!(i == propertyPathTree.Count-1))
-                        {
-                           
+                        {                           
                             targetObject = possibleNewTargetObject;
-                        }
-                        else
-                        {
-                           // lastPosition--;
-                        }
+                        } 
                     }
                 }
                 else
@@ -101,11 +103,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                         {                          
                             targetObject = propertyInfoToGet.GetValue(targetObject, null);
                         }
-                        else
-                        {
-                           // lastPosition--;
-                        }
-
                     }
                 } 
             }
@@ -113,7 +110,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
 
             // two things can happen now.  The targetproperty can be an IDictionary - in that
-            // case, it's valid if there's 1 item left in the propertyPathTree.
+            // case, it's valid for add if there's 1 item left in the propertyPathTree.
             //
             // it can also be a property info.  In that case, if there's nothing left in the path
             // tree we're at the end, if there's one left we can try and set that.  
@@ -122,48 +119,59 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
             if (targetObject is IDictionary<String, Object>)
             {
-                var leftOverPath = propertyPathTree.GetRange(lastPosition, propertyPathTree.Count - lastPosition);
-                
+                var leftOverPath = propertyPathTree
+                    .GetRange(lastPosition, propertyPathTree.Count - lastPosition);
+
+                UseDynamicLogic = true;
+
                 if (leftOverPath.Count == 1)
                 {
-                    Container = targetObject as IDictionary<String, Object>;
-                    UseDynamicLogic = true;
-                    IsValidPath = true;
+                    Container = targetObject as IDictionary<String, Object>;                   
+                    IsValidPathForAdd = true;
                     PropertyPathInContainer = leftOverPath.Last();
+
+                    // to be able to remove this property, it must exist
+
+                    IsValidPathForRemove = Container.ContainsKeyCaseInsensitive(PropertyPathInContainer);
+                 
                 }
                 else
                 {
-                    IsValidPath = false;
+                    IsValidPathForAdd = false; 
+                    IsValidPathForRemove = false;
                 }
-
-                return;
+                 
             }
             else
             {
-                var leftOverPath = propertyPathTree.GetRange(lastPosition, propertyPathTree.Count - lastPosition);
-                
+                var leftOverPath = propertyPathTree
+                    .GetRange(lastPosition, propertyPathTree.Count - lastPosition);
+
+                UseDynamicLogic = false;
+
                 if (leftOverPath.Count == 1)
                 {
-                    // if the targetObject is a propertyInfo ( = non-dynamic), we can try and
-                    // get the propertyInfo of the last one on this targetobject.
+                    // Get the property
                     var propertyToFind = targetObject.GetType().GetProperty(leftOverPath.Last(),
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-
-                    UseDynamicLogic = false;
+                    
+                
                     if (propertyToFind == null)
                     {
-                        IsValidPath = false;
+                        IsValidPathForAdd = false;
+                        IsValidPathForRemove = false;
                     }
                     else
                     {
-                        IsValidPath = true;
+                        IsValidPathForAdd = true;
+                        IsValidPathForRemove = true;
                         PropertyInfo = propertyToFind;
                     }
                 }
                 else
                 {
-                    IsValidPath = false;
+                    IsValidPathForAdd = false;
+                    IsValidPathForRemove = false;
                 }
             }
              

@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;

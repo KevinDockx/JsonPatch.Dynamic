@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
-    public class DynamicObjectAdapterTests
+    public class AddOperationTests
     {
 
 
@@ -187,6 +187,31 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(1, doc.DynamicProperty.NewInt);
+
+        }
+
+        [Fact]
+        public void AddNewPropertyToTypedObjectInExpandoObject() 
+        {
+            dynamic dynamicProperty = new ExpandoObject();
+            dynamicProperty.StringProperty = "A";
+
+            var doc = new NestedDTO()
+            {
+                DynamicProperty = dynamicProperty
+            };
+
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Add("DynamicProperty/StringProperty", "B");
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            deserialized.ApplyTo(doc);
+
+            Assert.Equal("B", doc.DynamicProperty.StringProperty);
 
         }
 

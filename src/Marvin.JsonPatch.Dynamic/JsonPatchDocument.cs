@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Adapters;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Adapters;
 using Marvin.JsonPatch.Operations;
 using Marvin.JsonPatch.Dynamic.Operations;
 using Newtonsoft.Json;
