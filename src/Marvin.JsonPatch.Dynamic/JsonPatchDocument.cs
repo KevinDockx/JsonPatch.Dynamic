@@ -77,6 +77,32 @@ namespace Marvin.JsonPatch.Dynamic
             return this;
         }
 
+        // TODO: / toevoegen in 't begin, en checken of er geen dubbele "/" in zit ergens - ook bij 
+        // zelf toevegen van / in een path bij een array!
+        public JsonPatchDocument Replace(string path, object value)
+        {
+            Operations.Add(new Operation("replace", path, null, value));
+            return this;
+        }
+
+        
+      // TODO: testen in array op alle operaties eg 0/0/0/0
+
+        public JsonPatchDocument ReplaceInArray(string path, object value, int position)
+        {
+            Operations.Add(new Operation("replace", path  + "/" + position, null, value));
+            return this;
+        }
+
+        
+        public JsonPatchDocument ReplaceInArray(string path, object value)
+        {
+            Operations.Add(new Operation("replace", path + "/-", null, value));
+            return this;
+        }
+
+       
+
 
 
 

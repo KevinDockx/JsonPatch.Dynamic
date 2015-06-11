@@ -35,12 +35,12 @@ namespace Marvin.JsonPatch.Dynamic.Operations
                 case OperationType.Remove:
                     adapter.Remove(operation, objectToApplyTo);
                     break;
-                //case OperationType.Replace:
-                //    adapter.Replace(this, objectToApplyTo);
-                //    break;
-                //case OperationType.Move:
-                //    adapter.Move(this, objectToApplyTo);
-                //    break;
+                case OperationType.Replace:
+                    adapter.Replace(operation, objectToApplyTo);
+                    break;
+                case OperationType.Move:
+                    adapter.Move(operation, objectToApplyTo);
+                    break;
                 //case OperationType.Copy:
                 //    adapter.Copy(this, objectToApplyTo);
                 //    break;
