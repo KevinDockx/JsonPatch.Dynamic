@@ -57,6 +57,29 @@ namespace Marvin.JsonPatch.Dynamic
         }
 
 
+
+
+        public JsonPatchDocument Remove(string path)
+        {
+            Operations.Add(new Operation("remove", path, null, null));
+            return this;
+        }
+
+        public JsonPatchDocument RemoveFromArray(string path)
+        {
+            Operations.Add(new Operation("remove", path + "/-", null, null));
+            return this;
+        }
+
+        public JsonPatchDocument RemoveFromArray(string path, int position)
+        {
+            Operations.Add(new Operation("remove", path + "/" + position, null, null));
+            return this;
+        }
+
+
+
+
         public void ApplyTo<T>(T objectToApplyTo)
         {
             ApplyTo(objectToApplyTo, new DynamicObjectAdapter());

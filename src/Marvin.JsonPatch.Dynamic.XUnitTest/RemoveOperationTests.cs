@@ -12,12 +12,49 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class RemoveOperationTests
     {
-        
-
-     
 
 
+        [Fact]
+        public void RemovePropertyShouldFailIfRootIsAnonymous()
+        {
 
+            dynamic doc = new
+            {
+                Test = 1
+            };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Remove("Test");
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+
+        }
+
+
+        [Fact]
+        public void RemovePropertyShouldFailIfItDoesntExist()
+        {
+
+            dynamic doc = new ExpandoObject();
+            doc.Test = 1; 
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Remove("NonExisting");
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+
+        }
+
+
+         
         [Fact]
         public void RemovePropertyFromExpandoObject()
         {
@@ -27,7 +64,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("NewInt", 1);
+            patchDoc.Remove("Test");
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -35,9 +72,13 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             deserialized.ApplyTo(obj);
 
-            Assert.Equal(1, obj.NewInt);
-            Assert.Equal(1, obj.Test);
+            var cont = obj as IDictionary<string, object>;
 
+            object valueFromDictionary;
+
+            cont.TryGetValue("Test", out valueFromDictionary);
+            
+            Assert.Null(valueFromDictionary);
 
         }
 

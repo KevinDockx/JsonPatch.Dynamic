@@ -188,38 +188,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                 var pathProperty = result.PropertyInfo;
 
-
-            //// does property at path exist?
-            //if (pathProperty == null)
-            //{
-            //    // the propertyinfo does not exist.  This means the property truly doesn't 
-            //    // exist, or the pathproperty is in fact an ExpandoObject.
-            //    // This is where we need to add dynamic checks - if 
-            //    // the container is an ExpandoObject, we can add the property nevertheless.
-
-            //    // - find container
-            //    // - check if container is ExpandoObject
-            //    // - if it is, check if we can add the property (eg: the "root" = prop-1 must exist)
-
-            //    var containerResult = DynamicPropertyHelpers.FindContainerForPath(objectToApplyTo, actualPathToProperty);
-
-            //    if (containerResult.IsValidContainer)
-            //    {
-
-            //        containerResult.Container.Add(containerResult.PathToPropertyInContainer, value);
-            //    }
-            //    else
-            //    {
-            //        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
-            //        string.Format("Patch failed: cannot add to the parent of the property at location path: {0}.  To be able to dynamically add properties, the parent must be an ExpandoObject.", path),
-            //        objectToApplyTo, 422);
-            //    }
-            //}
-            //else
-            //{
-
-
-                // it exists.  If it' an array, add to that array.  If it's not, we replace.
+                // If it' an array, add to that array.  If it's not, we replace.
 
                 // is the path an array (but not a string (= char[]))?  In this case,
                 // the path must end with "/position" or "/-", which we already determined before.
@@ -229,8 +198,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                     var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
                         && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
-
-                    // what if it's an array but there's no position??
+ 
                     if (isNonStringArray)
                     {
                         // now, get the generic type of the enumerable
@@ -347,105 +315,206 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         /// </summary>
         private void Remove(string path, object objectToApplyTo, Operation operationToReport)
         {
-            //// remove, in this implementation, CAN remove properties if the container is an
-            //// ExpandoObject.
+            // remove, in this implementation, CAN remove properties if the container is an
+            // ExpandoObject.
 
-            //var removeFromList = false;
-            //var positionAsInteger = -1;
-            //var actualPathToProperty = path;
+            var removeFromList = false;
+            var positionAsInteger = -1;
+            var actualPathToProperty = path;
 
-            //if (path.EndsWith("/-"))
-            //{
-            //    removeFromList = true;
-            //    actualPathToProperty = path.Substring(0, path.Length - 2);
-            //}
-            //else
-            //{
-            //    positionAsInteger = PropertyHelpers.GetNumericEnd(path);
+            if (path.EndsWith("/-"))
+            {
+                removeFromList = true;
+                actualPathToProperty = path.Substring(0, path.Length - 2);
+            }
+            else
+            {
+                positionAsInteger = PropertyHelpers.GetNumericEnd(path);
 
-            //    if (positionAsInteger > -1)
-            //    {
-            //        actualPathToProperty = path.Substring(0,
-            //            path.IndexOf('/' + positionAsInteger.ToString()));
-            //    }
-            //}
+                if (positionAsInteger > -1)
+                {
+                    actualPathToProperty = path.Substring(0,
+                        path.IndexOf('/' + positionAsInteger.ToString()));
+                }
+            }
 
-            //var pathProperty = PropertyHelpers
-            //    .FindProperty(objectToApplyTo, actualPathToProperty);
+      
+            var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty);
 
+            if (result.UseDynamicLogic)
+            {
+                if (result.IsValidPathForRemove)
+                {
+                    // if it's not an array, we can remove the property from
+                    // the dictionary.  If it's an array, we need to check the position first.
+                    if (removeFromList || positionAsInteger > -1)
+                    {
 
-            //   var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty);
+                        var typeOfPathProperty = result.Container
+                                .GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
 
-            //   if (result.UseDynamicLogic)
-            //   {
+                        var isNonStringArray = !(typeOfPathProperty == typeof(string))
+                            && typeof(IList).IsAssignableFrom(typeOfPathProperty);
+                                           
+                        if (isNonStringArray)
+                        {
+                            // now, get the generic type of the enumerable
+                            var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
+                         
+                            // var array = containerDictionary[finalPath] as IList;
 
-            //   }
+                            var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer) as IList;
 
-            //// does the target location exist?
-            //if (pathProperty == null)
-            //{
-            //    throw new JsonPatchException<T>(operationToReport,
-            //        string.Format("Patch failed: property at location path: {0} does not exist", path),
-            //        objectToApplyTo, 422);
-            //}
+                            if (removeFromList)
+                            {
+                                if (array.Count > 0)
+                                {
+                                    // if the array is empty, we should throw an error
+                                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                      string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                      path),
+                                      objectToApplyTo, 422);
+                                }
 
-            //// get the property, and remove it - in this case, for DTO's, that means setting
-            //// it to null or its default value; in case of an array, remove at provided index
-            //// or at the end.
+                                array.RemoveAt(array.Count - 1);
+                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                            }
+                            else
+                            {
+                                if (positionAsInteger < array.Count)
+                                {
+                                    array.RemoveAt(positionAsInteger);
+                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                }
+                                else
+                                {
+                                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                   string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                   path),
+                                   objectToApplyTo, 422);
+                                }
 
+                            } 
+                        }
+                        else
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                               string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: expected array",
+                               path),
+                               objectToApplyTo, 422);
+                        }
+                    }
+                    else
+                    {
+                        // remove the property
+                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInContainer);
+                    }
 
-            //if (removeFromList || positionAsInteger > -1)
-            //{
+                }
+                else
+                {
+                       throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                    string.Format("Patch failed: cannot remove property at location path: {0}.  To be able to dynamically remove properties, the parent must be an ExpandoObject.", path),
+                    objectToApplyTo, 422);
+                }
+            } 
+            else
+            {
+                // not dynamic
 
-            //    var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
-            //        && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
+                if (!result.IsValidPathForRemove)
+                {
+                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                      string.Format("Patch failed: the provided path is invalid: {0}.", path),
+                      objectToApplyTo, 422);
+                }
 
-            //    // what if it's an array but there's no position??
-            //    if (isNonStringArray)
-            //    {
-            //        // now, get the generic type of the enumerable
-            //        var genericTypeOfArray = PropertyHelpers.GetEnumerableType(pathProperty.PropertyType);
+                var pathProperty = result.PropertyInfo;
 
-            //        // TODO: nested!
-            //        // get value (it can be cast, we just checked that)
-            //        var array = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty) as IList;
+                if (removeFromList || positionAsInteger > -1)
+                { 
 
-            //        if (removeFromList)
-            //        {
-            //            array.RemoveAt(array.Count - 1);
-            //        }
-            //        else
-            //        {
-            //            if (positionAsInteger < array.Count)
-            //            {
-            //                array.RemoveAt(positionAsInteger);
-            //            }
-            //            else
-            //            {
-            //                throw new JsonPatchException<T>(operationToReport,
-            //           string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
-            //           path),
-            //           objectToApplyTo, 422);
-            //            }
-            //        }
+                    var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
+                        && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
 
-            //    }
-            //    else
-            //    {
-            //        throw new JsonPatchException<T>(operationToReport,
-            //           string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: expected array",
-            //           path),
-            //           objectToApplyTo, 422);
-            //    }
-            //}
-            //else
-            //{
+                    // what if it's an array but there's no position??
+                    if (isNonStringArray)
+                    {
+                       
+                        // now, get the generic type of the enumerable
+                        var genericTypeOfArray = PropertyHelpers.GetEnumerableType(pathProperty.PropertyType);
+                        
+                        // get value (it can be cast, we just checked that)
+                        var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
 
-            //    // setting the value to "null" will use the default value in case of value types, and
-            //    // null in case of reference types
-            //    PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty, null);
-            //}
+                        IList array;
 
+                        if (getResult.CanGet)
+                        {
+                            array = getResult.Value as IList;
+                        }
+                        else
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                string.Format("Patch failed: cannot get property value at path {0}.  Possible cause: the property doesn't have an accessible getter.",
+                                path),
+                                objectToApplyTo, 422);
+                        }
+
+                        if (removeFromList)
+                        {
+                            if (array.Count > 0)
+                            {
+                                // if the array is empty, we should throw an error
+                                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                  string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                  path),
+                                  objectToApplyTo, 422);
+                            }
+
+                            array.RemoveAt(array.Count - 1);
+                        }
+                        else
+                        {
+                            if (positionAsInteger < array.Count)
+                            {
+                                array.RemoveAt(positionAsInteger);
+                            }
+                            else
+                            {
+                                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                 string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                 path),
+                                 objectToApplyTo, 422);
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                           string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: expected array",
+                           path),
+                           objectToApplyTo, 422);
+                    }
+                }
+                else
+                {
+
+                    var setResult = PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
+                         null);
+
+                    if (!(setResult.CanSet))
+                    {
+                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                       string.Format("Patch failed: property at path location cannot be removed (set to default/null for non-dynamic properties): {0}.  Possible causes: the property may not have an accessible setter, or the property may be part of an anonymous object (and thus cannot be changed after initialization).",
+                       path),
+                       objectToApplyTo, 422);
+                    }
+
+ 
+                }
+            } 
         }
 
 

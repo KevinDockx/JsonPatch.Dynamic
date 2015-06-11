@@ -60,10 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddOperationTests.cs" />
+    <Compile Include="AddTypedOperationTests.cs" />
     <Compile Include="NestedDTO.cs" />
     <Compile Include="NonGenericPatchDocumentTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoveOperationTests.cs" />
+    <Compile Include="RemoveTypedOperationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Marvin.JsonPatch.Dynamic\Marvin.JsonPatch.Dynamic.csproj">

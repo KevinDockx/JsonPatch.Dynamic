@@ -31,6 +31,32 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
         }
 
+
+        internal static void RemoveValueForCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+      string key)
+        {
+            string realKey = "";
+            key = key.ToLower();
+            foreach (KeyValuePair<string, object> kvp in propertyDictionary)
+            {
+                if (kvp.Key.ToLower() == key)
+                {
+                    realKey = kvp.Key; 
+                    break;
+                    // return kvp;
+                }
+            }
+            
+            if (realKey != "")
+            {
+                propertyDictionary.Remove(realKey);
+            }
+
+             
+
+        }
+
+
         internal static object GetValueForCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
           string key)
         {

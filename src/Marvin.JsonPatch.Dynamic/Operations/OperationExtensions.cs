@@ -32,9 +32,9 @@ namespace Marvin.JsonPatch.Dynamic.Operations
                 case OperationType.Add:
                     adapter.Add(operation, objectToApplyTo);
                     break;
-                //case OperationType.Remove:
-                //    adapter.Remove(this, objectToApplyTo);
-                //    break;
+                case OperationType.Remove:
+                    adapter.Remove(operation, objectToApplyTo);
+                    break;
                 //case OperationType.Replace:
                 //    adapter.Replace(this, objectToApplyTo);
                 //    break;
