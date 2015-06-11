@@ -60,7 +60,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             {
                 if (result.IsValidPathForAdd)
                 { 
-                    if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInContainer))
+                    if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInParent))
                     {
                         // Existing property.  
                         // If it's not an array, we need to check if the value fits the property type
@@ -74,7 +74,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             //  var typeOfPathProperty = containerDictionary[finalPath].GetType();
 
                             var typeOfPathProperty = result.Container
-                                .GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
+                                .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
 
                             var isNonStringArray = !(typeOfPathProperty == typeof(string))
                                 && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
@@ -97,12 +97,12 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 // get value (it can be cast, we just checked that)
                                 // var array = containerDictionary[finalPath] as IList;
 
-                                var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer) as IList;
+                                var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
 
                                 if (appendList)
                                 {
                                     array.Add(conversionResult.ConvertedInstance);
-                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
                                 }
                                 else
                                 {
@@ -111,7 +111,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                     if (positionAsInteger <= array.Count)
                                     {
                                         array.Insert(positionAsInteger, conversionResult.ConvertedInstance);
-                                        result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                        result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
                                     }
                                     else
                                     {
@@ -137,7 +137,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         {
                             // get the actual type
 
-                            var typeOfPathProperty = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
+                            var typeOfPathProperty = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
 
                             // var typeOfPathProperty = containerDictionary[finalPath].GetType();
 
@@ -148,7 +148,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             // conversion successful
                             if (conversionResultTuple.CanBeConverted)
                             {
-                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, 
+                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, 
                                     conversionResultTuple.ConvertedInstance);
                             }
                             else
@@ -165,7 +165,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     else
                     {
                         // New property - add it.  
-                        result.Container.Add(result.PropertyPathInContainer, value);
+                        result.Container.Add(result.PropertyPathInParent, value);
 
                     }
                                        
@@ -215,7 +215,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         }
 
                         // get value (it can be cast, we just checked that)
-                        var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
+                        var getResult = PropertyHelpers.GetValue(pathProperty, result.ParentObject, result.PropertyPathInParent);
 
                         IList array;
 
@@ -273,7 +273,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     // conversion successful
                     if (conversionResultTuple.CanBeConverted)
                     {
-                        var setResult = PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
+                        var setResult = PropertyHelpers.SetValue(pathProperty, result.ParentObject, result.PropertyPathInParent,
                             conversionResultTuple.ConvertedInstance);
 
                         if (!(setResult.CanSet))
@@ -351,7 +351,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     {
 
                         var typeOfPathProperty = result.Container
-                                .GetValueForCaseInsensitiveKey(result.PropertyPathInContainer).GetType();
+                                .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
 
                         var isNonStringArray = !(typeOfPathProperty == typeof(string))
                             && typeof(IList).IsAssignableFrom(typeOfPathProperty);
@@ -363,11 +363,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                          
                             // var array = containerDictionary[finalPath] as IList;
 
-                            var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInContainer) as IList;
+                            var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
 
                             if (removeFromList)
                             {
-                                if (array.Count > 0)
+                                if (array.Count == 0)
                                 {
                                     // if the array is empty, we should throw an error
                                     throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
@@ -377,14 +377,14 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 }
 
                                 array.RemoveAt(array.Count - 1);
-                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
                             }
                             else
                             {
                                 if (positionAsInteger < array.Count)
                                 {
                                     array.RemoveAt(positionAsInteger);
-                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInContainer, array);
+                                    result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
                                 }
                                 else
                                 {
@@ -407,7 +407,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     else
                     {
                         // remove the property
-                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInContainer);
+                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInParent);
                     }
 
                 }
@@ -445,7 +445,8 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         var genericTypeOfArray = PropertyHelpers.GetEnumerableType(pathProperty.PropertyType);
                         
                         // get value (it can be cast, we just checked that)
-                        var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
+                       // var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
+                        var getResult = PropertyHelpers.GetValue(pathProperty, result.ParentObject, result.PropertyPathInParent);
 
                         IList array;
 
@@ -463,7 +464,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                         if (removeFromList)
                         {
-                            if (array.Count > 0)
+                            if (array.Count == 0)
                             {
                                 // if the array is empty, we should throw an error
                                 throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
@@ -501,7 +502,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 else
                 {
 
-                    var setResult = PropertyHelpers.SetValue(pathProperty, objectToApplyTo, actualPathToProperty,
+                    var setResult = PropertyHelpers.SetValue(pathProperty, result.ParentObject, result.PropertyPathInParent,
                          null);
 
                     if (!(setResult.CanSet))

@@ -25,19 +25,20 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
         public IDictionary<String, Object> Container { get; private set; }
         
-        public string PropertyPathInContainer {get; private set;}
+        public string PropertyPathInParent {get; private set;}
 
         public string PropertyPath { get; private set; }
 
         public PropertyInfo PropertyInfo { get; private set; }
 
-        public object Object { get; private set; }
+        public object OriginalObject { get; private set; }
 
+        public object ParentObject { get; private set; }
 
         public ObjectTreeAnalysisResult(object objectToSearch, string propertyPath)
         {
             PropertyPath = propertyPath;
-            Object = objectToSearch;
+            OriginalObject = objectToSearch;
 
             // analyze the tree
 
@@ -51,7 +52,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
             var propertyPathTree = PropertyPath.Split('/').ToList();
 
-            object targetObject = Object;
+            object targetObject = OriginalObject;
 
             if (string.IsNullOrWhiteSpace(propertyPathTree[0]))
             {
@@ -128,11 +129,11 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 {
                     Container = targetObject as IDictionary<String, Object>;                   
                     IsValidPathForAdd = true;
-                    PropertyPathInContainer = leftOverPath.Last();
+                    PropertyPathInParent = leftOverPath.Last();
 
                     // to be able to remove this property, it must exist
 
-                    IsValidPathForRemove = Container.ContainsKeyCaseInsensitive(PropertyPathInContainer);
+                    IsValidPathForRemove = Container.ContainsKeyCaseInsensitive(PropertyPathInParent);
                  
                 }
                 else
@@ -151,6 +152,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                 if (leftOverPath.Count == 1)
                 {
+                    
                     // Get the property
                     var propertyToFind = targetObject.GetType().GetProperty(leftOverPath.Last(),
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
@@ -166,6 +168,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                         IsValidPathForAdd = true;
                         IsValidPathForRemove = true;
                         PropertyInfo = propertyToFind;
+                        PropertyPathInParent = leftOverPath.Last();
+                        ParentObject = targetObject;
+
                     }
                 }
                 else

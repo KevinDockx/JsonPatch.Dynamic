@@ -190,6 +190,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
         }
 
+
+ 
+
+
+
         [Fact]
         public void AddNewPropertyToTypedObjectInExpandoObject() 
         {
@@ -494,6 +499,26 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
+        }
+
+
+        [Fact]
+        public void AddToListNegativePosition()
+        {
+            dynamic doc = new ExpandoObject();
+            doc.IntegerList = new List<int>() { 1, 2, 3 };
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.AddToArray("IntegerList", 4, -1);
+
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+             
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+
         }
 
 
