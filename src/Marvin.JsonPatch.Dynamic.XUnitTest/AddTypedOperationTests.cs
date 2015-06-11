@@ -33,5 +33,34 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
         }
 
+
+        [Fact]
+        public void AddToListInList()
+        {
+            var doc = new SimpleDTOWithNestedDTO()
+            {
+                ListOfSimpleDTO = new List<SimpleDTO>()
+                {
+                     new SimpleDTO()
+                {
+                    IntegerList = new List<int>() { 1, 2, 3 }
+                }
+                }
+            };
+
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.AddToArray("ListOfSimpleDTO/0/IntegerList", 4);
+
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            deserialized.ApplyTo(doc);
+
+            Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.ListOfSimpleDTO[0].IntegerList);
+        }
+
     }
 }

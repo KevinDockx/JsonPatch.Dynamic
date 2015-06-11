@@ -14,10 +14,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
         public SimpleDTO SimpleDTO { get; set; }
 
+        public List<SimpleDTO> ListOfSimpleDTO { get; set; }
+
+
         public SimpleDTOWithNestedDTO()
         {
-            this.NestedDTO = new NestedDTO();
-            this.SimpleDTO = new SimpleDTO();
+            NestedDTO = new NestedDTO();
+            SimpleDTO = new SimpleDTO();
+            ListOfSimpleDTO = new List<SimpleDTO>();
         }
     }
 }

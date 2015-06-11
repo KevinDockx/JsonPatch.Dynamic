@@ -49,7 +49,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 if (positionAsInteger > -1)
                 {
                     actualPathToProperty = path.Substring(0,
-                        path.IndexOf('/' + positionAsInteger.ToString()));
+                        path.LastIndexOf('/' + positionAsInteger.ToString()));
                 }
             }
 
@@ -59,7 +59,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             if (result.UseDynamicLogic)
             {
                 if (result.IsValidPathForAdd)
-                { 
+                {
                     if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInParent))
                     {
                         // Existing property.  
@@ -148,7 +148,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             // conversion successful
                             if (conversionResultTuple.CanBeConverted)
                             {
-                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, 
+                                result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent,
                                     conversionResultTuple.ConvertedInstance);
                             }
                             else
@@ -168,7 +168,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         result.Container.Add(result.PropertyPathInParent, value);
 
                     }
-                                       
+
                 }
                 else
                 {
@@ -198,7 +198,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                     var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
                         && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
- 
+
                     if (isNonStringArray)
                     {
                         // now, get the generic type of the enumerable
@@ -221,7 +221,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                         if (getResult.CanGet)
                         {
-                            array =  getResult.Value as IList;
+                            array = getResult.Value as IList;
                         }
                         else
                         {
@@ -231,7 +231,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 objectToApplyTo, 422);
                         }
 
-                        
+
 
 
                         if (appendList)
@@ -334,11 +334,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 if (positionAsInteger > -1)
                 {
                     actualPathToProperty = path.Substring(0,
-                        path.IndexOf('/' + positionAsInteger.ToString()));
+                        path.LastIndexOf('/' + positionAsInteger.ToString()));
                 }
             }
 
-      
+
             var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty);
 
             if (result.UseDynamicLogic)
@@ -355,12 +355,12 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                         var isNonStringArray = !(typeOfPathProperty == typeof(string))
                             && typeof(IList).IsAssignableFrom(typeOfPathProperty);
-                                           
+
                         if (isNonStringArray)
                         {
                             // now, get the generic type of the enumerable
                             var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
-                         
+
                             // var array = containerDictionary[finalPath] as IList;
 
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
@@ -394,7 +394,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                    objectToApplyTo, 422);
                                 }
 
-                            } 
+                            }
                         }
                         else
                         {
@@ -407,17 +407,17 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     else
                     {
                         // remove the property
-                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInParent);
+                        result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInParent);
                     }
 
                 }
                 else
                 {
-                       throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
-                    string.Format("Patch failed: cannot remove property at location path: {0}.  To be able to dynamically remove properties, the parent must be an ExpandoObject.", path),
-                    objectToApplyTo, 422);
+                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                 string.Format("Patch failed: cannot remove property at location path: {0}.  To be able to dynamically remove properties, the parent must be an ExpandoObject.", path),
+                 objectToApplyTo, 422);
                 }
-            } 
+            }
             else
             {
                 // not dynamic
@@ -432,7 +432,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 var pathProperty = result.PropertyInfo;
 
                 if (removeFromList || positionAsInteger > -1)
-                { 
+                {
 
                     var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
                         && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
@@ -440,12 +440,12 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     // what if it's an array but there's no position??
                     if (isNonStringArray)
                     {
-                       
+
                         // now, get the generic type of the enumerable
                         var genericTypeOfArray = PropertyHelpers.GetEnumerableType(pathProperty.PropertyType);
-                        
+
                         // get value (it can be cast, we just checked that)
-                       // var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
+                        // var getResult = PropertyHelpers.GetValue(pathProperty, objectToApplyTo, actualPathToProperty);
                         var getResult = PropertyHelpers.GetValue(pathProperty, result.ParentObject, result.PropertyPathInParent);
 
                         IList array;
@@ -513,12 +513,189 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                        objectToApplyTo, 422);
                     }
 
- 
+
                 }
-            } 
+            }
+        }
+
+
+        public void Replace(Operation operation, dynamic objectToApplyTo)
+        {
+
+            Remove(operation.path, objectToApplyTo, operation);
+            Add(operation.path, operation.value, objectToApplyTo, operation);
+
         }
 
 
 
+
+        public void Move(Operation operation, dynamic objectToApplyTo)
+        {
+
+            // get value at from location
+            object valueAtFromLocation = null;
+            var positionAsInteger = -1;
+            var actualFromProperty = operation.from;
+
+            positionAsInteger = PropertyHelpers.GetNumericEnd(operation.from);
+
+            if (positionAsInteger > -1)
+            {
+                actualFromProperty = operation.from.Substring(0,
+                    operation.from.LastIndexOf('/' + positionAsInteger.ToString()));
+            }
+
+            // get the property at the from location.
+
+            // first, analyze the tree.
+
+            var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualFromProperty);
+
+            if (result.UseDynamicLogic)
+            {
+                // find the property
+                if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInParent))
+                {
+                    if (positionAsInteger > -1)
+                    {
+                        // get the actual type
+
+                        var typeOfPathProperty = result.Container
+                            .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
+
+                        var isNonStringArray = !(typeOfPathProperty == typeof(string))
+                            && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
+
+                        if (isNonStringArray)
+                        {
+                            // now, get the generic type of the enumerable
+                            var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
+
+                            // get value
+                            var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
+
+                            if (positionAsInteger < array.Count)
+                            {
+                                valueAtFromLocation = array[positionAsInteger];
+                            }
+                            else
+                            {
+                                throw new Dynamic.Exceptions.JsonPatchException(operation,
+                              string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
+                                objectToApplyTo, 422);
+                            }
+
+                        }
+                        else
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operation,
+                                  string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", operation.from),
+                                    objectToApplyTo, 422);
+                        }
+                    }
+                    else
+                    {
+                        // get the value
+                        valueAtFromLocation =
+                            result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
+                    }
+                }
+                else
+                {
+                    throw new Dynamic.Exceptions.JsonPatchException(operation,
+                    string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
+                    objectToApplyTo, 422);
+                }
+            }
+            else
+            {
+
+                // not dynamic.
+
+                var pathProperty = result.PropertyInfo;
+
+                // is the path an array (but not a string (= char[]))?  In this case,
+                // the path must end with "/position" or "/-", which we already determined before.
+
+                if (positionAsInteger > -1)
+                {
+
+                    var isNonStringArray = !(pathProperty.PropertyType == typeof(string))
+                        && typeof(IList).IsAssignableFrom(pathProperty.PropertyType);
+
+                    if (isNonStringArray)
+                    {
+                        // now, get the generic type of the enumerable
+                        var genericTypeOfArray = PropertyHelpers.GetEnumerableType(pathProperty.PropertyType);
+
+                        // get value (it can be cast, we just checked that)
+                        var getResult = PropertyHelpers.GetValue(pathProperty,
+                            result.ParentObject, result.PropertyPathInParent);
+
+                        IList array;
+
+                        if (getResult.CanGet)
+                        {
+                            array = getResult.Value as IList;
+                        }
+                        else
+                        {
+                            throw new Dynamic.Exceptions.JsonPatchException(operation,
+                                 string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
+                                   objectToApplyTo, 422);
+                        }
+
+                        // specified index must not be greater than the amount of items in the
+                        // array
+                        if (positionAsInteger < array.Count)
+                        {
+                            valueAtFromLocation = array[positionAsInteger];
+                        }
+                        else
+                        {
+
+                            throw new Dynamic.Exceptions.JsonPatchException(operation,
+                          string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
+                            objectToApplyTo, 422);
+                        }
+                    }
+                    else
+                    {
+                        throw new Dynamic.Exceptions.JsonPatchException(operation,
+                                 string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", operation.from),
+                                   objectToApplyTo, 422);
+                    }
+
+
+                }
+                else
+                {
+                    var getResult = PropertyHelpers.GetValue(pathProperty,
+                        result.ParentObject, result.PropertyPathInParent);
+
+                    if (getResult.CanGet)
+                    {
+                        valueAtFromLocation = getResult.Value as IList;
+                    }
+                    else
+                    {
+                        throw new Dynamic.Exceptions.JsonPatchException(operation,
+                       string.Format("Patch failed: property at location from: {0} does not exist or cannot be accessed.", operation.from),
+                       objectToApplyTo, 422);
+                    }
+                }
+            }
+
+
+            // remove that value
+
+            Remove(operation.from, objectToApplyTo, operation);
+
+            // add that value to the path location
+
+            Add(operation.path, valueAtFromLocation, objectToApplyTo, operation);
+
+        }
     }
 }
