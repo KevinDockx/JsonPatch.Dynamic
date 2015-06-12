@@ -14,5 +14,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
     public class NonGenericPatchDocumentTests
     {
         // WIP
+        // test paths, test generic patchdoc serialize to non-generic & the other way around
     }
 }

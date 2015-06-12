@@ -311,9 +311,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
         /// <summary>
         /// Remove is used by various operations (eg: remove, move, ...), yet through different operations;
-        /// This method allows code reuse yet reporting the correct operation on error
+        /// This method allows code reuse yet reporting the correct operation on error.  The return value
+        /// contains the type of the item that has been removed - this can be used by other methods, like 
+        /// replace, to ensure that we can pass in the correctly typed value to whatever method follows.
         /// </summary>
-        private void Remove(string path, object objectToApplyTo, Operation operationToReport)
+        private Type Remove(string path, object objectToApplyTo, Operation operationToReport)
         {
             // remove, in this implementation, CAN remove properties if the container is an
             // ExpandoObject.
@@ -360,9 +362,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         {
                             // now, get the generic type of the enumerable
                             var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
-
-                            // var array = containerDictionary[finalPath] as IList;
-
+ 
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
 
                             if (removeFromList)
@@ -378,6 +378,9 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                                 array.RemoveAt(array.Count - 1);
                                 result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
+
+                                // return the type of the value that has been removed.
+                                return genericTypeOfArray;
                             }
                             else
                             {
@@ -385,6 +388,9 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 {
                                     array.RemoveAt(positionAsInteger);
                                     result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
+
+                                    // return the type of the value that has been removed.
+                                    return genericTypeOfArray;
                                 }
                                 else
                                 {
@@ -406,8 +412,16 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     }
                     else
                     {
+                        // get the property
+                        var getResult = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
+                        var actualType = getResult.GetType();
+
                         // remove the property
                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInParent);
+
+                        // TODO gettype!
+                        return actualType;
+
                     }
 
                 }
@@ -474,12 +488,18 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             }
 
                             array.RemoveAt(array.Count - 1);
+
+                            // return the type of the value that has been removed
+                            return genericTypeOfArray;
                         }
                         else
                         {
                             if (positionAsInteger < array.Count)
                             {
                                 array.RemoveAt(positionAsInteger);
+
+                                // return the type of the value that has been removed
+                                return genericTypeOfArray;
                             }
                             else
                             {
@@ -504,7 +524,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                     var setResult = PropertyHelpers.SetValue(pathProperty, result.ParentObject, result.PropertyPathInParent,
                          null);
-
+                    
                     if (!(setResult.CanSet))
                     {
                         throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
@@ -512,7 +532,10 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                        path),
                        objectToApplyTo, 422);
                     }
-
+                    else
+                    {
+                        return setResult.PropertyToSet.PropertyType;
+                    }
 
                 }
             }
@@ -522,8 +545,21 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         public void Replace(Operation operation, dynamic objectToApplyTo)
         {
 
-            Remove(operation.path, objectToApplyTo, operation);
-            Add(operation.path, operation.value, objectToApplyTo, operation);
+           var typeOfRemovedProperty = Remove(operation.path, objectToApplyTo, operation);
+
+           var conversionResult = PropertyHelpers.ConvertToActualType(typeOfRemovedProperty, operation.value);
+            if (conversionResult.CanBeConverted)
+            {
+                Add(operation.path, conversionResult.ConvertedInstance, objectToApplyTo, operation);
+            }
+            else
+            {
+                throw new Dynamic.Exceptions.JsonPatchException(operation,
+                     string.Format("Patch failed: property value cannot be converted to type of path location {0}",
+                     operation.path),
+                     objectToApplyTo, 422);
+            }
+          
 
         }
 
@@ -676,7 +712,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                     if (getResult.CanGet)
                     {
-                        valueAtFromLocation = getResult.Value as IList;
+                        valueAtFromLocation = getResult.Value;
                     }
                     else
                     {

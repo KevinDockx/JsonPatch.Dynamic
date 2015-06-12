@@ -8,6 +8,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class SimpleDTO
     {
+        public List<SimpleDTO> SimpleDTOList { get; set; }
         public List<int> IntegerList { get; set; }
         public int IntegerValue { get; set; }
         public string StringProperty { get; set; }

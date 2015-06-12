@@ -61,11 +61,15 @@
   <ItemGroup>
     <Compile Include="AddOperationTests.cs" />
     <Compile Include="AddTypedOperationTests.cs" />
+    <Compile Include="MoveOperationTests.cs" />
+    <Compile Include="MoveTypedOperationTests.cs" />
     <Compile Include="NestedDTO.cs" />
     <Compile Include="NonGenericPatchDocumentTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoveOperationTests.cs" />
     <Compile Include="RemoveTypedOperationTests.cs" />
+    <Compile Include="ReplaceOperationTests.cs" />
+    <Compile Include="ReplaceTypedOperationTests.cs" />
     <Compile Include="SimpleDTO.cs" />
     <Compile Include="SimpleDTOWithNestedDTO.cs" />
   </ItemGroup>
