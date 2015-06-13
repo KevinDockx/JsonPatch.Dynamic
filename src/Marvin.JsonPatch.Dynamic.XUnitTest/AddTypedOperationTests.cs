@@ -23,7 +23,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, -1);
+            patchDoc.Add("IntegerList/-1", 4);
 
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
@@ -51,7 +51,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("ListOfSimpleDTO/0/IntegerList", 4);
+            patchDoc.Add("ListOfSimpleDTO/0/IntegerList/0", 4);
 
 
             var serialized = JsonConvert.SerializeObject(patchDoc);

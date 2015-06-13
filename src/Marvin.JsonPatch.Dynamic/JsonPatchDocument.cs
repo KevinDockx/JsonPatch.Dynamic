@@ -38,58 +38,30 @@ namespace Marvin.JsonPatch.Dynamic
 
         }
 
-        public JsonPatchDocument Add<TProp>(string path, TProp value)
+        public JsonPatchDocument Add(string path, object value)
         {
             Operations.Add(new Operation("add", path, null, value));
             return this;
         }
-
-        public JsonPatchDocument AddToArray<TProp>(string path, TProp value)
-        {
-            Operations.Add(new Operation("add", path + "/-", null, value));
-            return this;
-        }
-
-        public JsonPatchDocument AddToArray<TProp>(string path, TProp value, int position)
-        {
-            Operations.Add(new Operation("add", path + "/" + position, null, value));
-            return this;
-        }
-
-
-
-
+          
         public JsonPatchDocument Remove(string path)
         {
             Operations.Add(new Operation("remove", path, null, null));
             return this;
         }
-         
-
-        // TODO: / toevoegen in 't begin, en checken of er geen dubbele "/" in zit ergens - ook bij 
-        // zelf toevegen van / in een path bij een array!
-        //
-        // Ook checken: mag geen . bevatten!
 
         public JsonPatchDocument Replace(string path, object value)
         {
             Operations.Add(new Operation("replace", path, null, value));
             return this;
         }
-
-        
-      // TODO: testen in array op alle operaties eg 0/0/0/0
-
-
-
+   
         public JsonPatchDocument Move(string from, string path)
         {
             Operations.Add(new Operation("move", path, from));
             return this;
         }
-
-         
-
+                 
         public JsonPatchDocument Copy(string from, string path)
         {
             Operations.Add(new Operation("copy", path, from));

@@ -26,7 +26,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("NewInt", 1);
+            patchDoc.Add("NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -46,7 +46,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("NewInt", 1);
+            patchDoc.Add("NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -74,7 +74,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("Nested/NewInt", 1);
+            patchDoc.Add("Nested/NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -99,7 +99,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("Nested/NewInt", 1);
+            patchDoc.Add("Nested/NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -153,7 +153,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("Nested/NewInt", 1);
+            patchDoc.Add("Nested/NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -179,7 +179,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add<int>("DynamicProperty/NewInt", 1);
+            patchDoc.Add("DynamicProperty/NewInt", 1);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -245,43 +245,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
 
         }
-
-
-
-
-        [Fact]
-        public void AddComplexValueToExpandoObject()
-        { 
-
-            dynamic doc = new ExpandoObject();
-            doc.Test = 1; 
-
-            dynamic valueToAdd = new { IntValue = 1, StringValue = "test", GuidValue = Guid.NewGuid() };
-
-            // create patch
-            JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Add("ComplexProperty", valueToAdd);
-
-            var serialized = JsonConvert.SerializeObject(patchDoc);
-            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
-            deserialized.ApplyTo(doc);
-
-            // check manually - assert can't handle this
-
-            if (!(valueToAdd == doc.ComplexProperty))
-            {
-                 Assert.Equal(1, 2);
-            }
-             
-            //Assert.Equal(valueToAdd.IntValue, doc.ComplexProperty.IntValue);
-            //Assert.Equal(valueToAdd.StringValue, doc.ComplexProperty.StringValue);
-            //Assert.Equal(valueToAdd.GuidValue, doc.ComplexProperty.GuidValue);
-            Assert.Equal(1, doc.Test);
-
-        }
-
+         
 
         [Fact]
         public void AddResultsReplaceShouldFailOnAnonymousDueToNoSetter()
@@ -489,7 +453,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, 0);
+            patchDoc.Add("IntegerList/0", 4);
 
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
@@ -510,7 +474,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, -1);
+            patchDoc.Add("IntegerList/-1", 4);
 
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
@@ -535,7 +499,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("integerlist", 4, 0);
+            patchDoc.Add("integerlist/0", 4);
 
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
@@ -560,7 +524,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, 4);
+            patchDoc.Add("IntegerList/4", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -583,7 +547,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, 3);
+            patchDoc.Add("IntegerList/3", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -608,7 +572,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, 0);
+            patchDoc.Add("IntegerList/0", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -632,7 +596,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4, -1);
+            patchDoc.Add("IntegerList/-1", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -654,7 +618,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.AddToArray("IntegerList", 4);
+            patchDoc.Add("IntegerList/-", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
