@@ -64,18 +64,7 @@ namespace Marvin.JsonPatch.Dynamic
             Operations.Add(new Operation("remove", path, null, null));
             return this;
         }
-
-        public JsonPatchDocument RemoveFromArray(string path)
-        {
-            Operations.Add(new Operation("remove", path + "/-", null, null));
-            return this;
-        }
-
-        public JsonPatchDocument RemoveFromArray(string path, int position)
-        {
-            Operations.Add(new Operation("remove", path + "/" + position, null, null));
-            return this;
-        }
+         
 
         // TODO: / toevoegen in 't begin, en checken of er geen dubbele "/" in zit ergens - ook bij 
         // zelf toevegen van / in een path bij een array!
