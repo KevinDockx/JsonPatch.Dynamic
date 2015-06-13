@@ -16,6 +16,7 @@ using System.Text;
 using Marvin.JsonPatch.Dynamic.Adapters;
 using System.Linq.Expressions;
 using Marvin.JsonPatch.Dynamic.Helpers;
+using Marvin.JsonPatch.Exceptions;
 
 namespace Marvin.JsonPatch.Dynamic
 {
@@ -40,31 +41,90 @@ namespace Marvin.JsonPatch.Dynamic
 
         public JsonPatchDocument Add(string path, object value)
         {
-            Operations.Add(new Operation("add", path, null, value));
+            var checkPathResult = PathHelpers.CheckPath(path);
+            if (!checkPathResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          path), null);
+            }
+ 
+            Operations.Add(new Operation("add", checkPathResult.AdjustedPath, null, value));
             return this;
         }
           
         public JsonPatchDocument Remove(string path)
         {
-            Operations.Add(new Operation("remove", path, null, null));
+            var checkPathResult = PathHelpers.CheckPath(path);
+            if (!checkPathResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          path), null);
+            }
+ 
+            Operations.Add(new Operation("remove", checkPathResult.AdjustedPath, null, null));
             return this;
         }
 
         public JsonPatchDocument Replace(string path, object value)
         {
-            Operations.Add(new Operation("replace", path, null, value));
+            var checkPathResult = PathHelpers.CheckPath(path);
+            if (!checkPathResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          path), null);
+            }
+ 
+            Operations.Add(new Operation("replace", checkPathResult.AdjustedPath, null, value));
             return this;
         }
    
         public JsonPatchDocument Move(string from, string path)
         {
-            Operations.Add(new Operation("move", path, from));
+            var checkPathResult = PathHelpers.CheckPath(path);
+            var checkFromResult = PathHelpers.CheckPath(from);
+
+            if (!checkPathResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          path), null);
+            }
+
+            if (!checkFromResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          from), null);
+            }
+
+
+            Operations.Add(new Operation("move", checkPathResult.AdjustedPath, checkFromResult.AdjustedPath));
             return this;
         }
                  
         public JsonPatchDocument Copy(string from, string path)
         {
-            Operations.Add(new Operation("copy", path, from));
+            var checkPathResult = PathHelpers.CheckPath(path);
+            var checkFromResult = PathHelpers.CheckPath(from);
+
+            if (!checkPathResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          path), null);
+            }
+
+            if (!checkFromResult.IsCorrectlyFormedPath)
+            {
+                throw new JsonPatchException(
+                   string.Format("Provided string is not a valid path: {0}",
+                          from), null);
+            }
+
+            Operations.Add(new Operation("copy", checkPathResult.AdjustedPath, checkFromResult.AdjustedPath));
             return this;
         }
 
@@ -90,79 +150,7 @@ namespace Marvin.JsonPatch.Dynamic
                 op.Apply(objectToApplyTo, adapter);
             }
 
-        }
-
-          
-
-        ///// <summary>
-        ///// Apply the patch document, and return a new ExpandoObject (dynamic) with the change applied.
-        ///// </summary>
-        ///// <param name="objectToCreateNewObjectFrom">The object to start from</param>
-        //public T CreateFrom<T>(T objectToCreateNewObjectFrom)
-        //{
-        //    var adapter = new MixedObjectAdapter();
-
-        //    //dynamic expandoObjectToApplyTo = new ExpandoObject();
-        //    //var propertyDictionary = (IDictionary<String, Object>)(expandoObjectToApplyTo);
-
-        //    //foreach (PropertyInfo propertyInfo in
-        //    //    objectToCreateNewObjectFrom.GetType().GetProperties())
-        //    //{
-        //    //    propertyDictionary[propertyInfo.Name] = propertyInfo.GetValue(objectToCreateNewObjectFrom, null);
-        //    //}
-
-        //    // apply each operation in order
-        //    foreach (var op in Operations)
-        //    {
-        //        op.Apply(objectToCreateNewObjectFrom, adapter);
-
-        //    }
-
-        //    return objectToCreateNewObjectFrom;
-        //    //  return CreateFrom(objectToCreateNewObjectFrom, new MixedObjectAdapter());
-        //}
-
-        ///// <summary>
-        ///// Apply the patch document, passing in a custom IObjectAdapter<typeparamref name=">"/>, 
-        ///// and return a new ExpandoObject (dynamic) with the change applied.
-        ///// </summary>
-        ///// <param name="objectToCreateNewObjectFrom">The object to start from</param>
-        ///// <param name="adapter">The IObjectAdapter instance to use</param>
-        ///// <returns></returns>
-        //public dynamic CreateFrom(dynamic objectToCreateNewObjectFrom, IDynamicObjectAdapter adapter)
-        //{
-        //    // clone the object that has been passed in.  This ensures all 
-        //    // nested objects are converted to expandoobjects as well, which is
-        //    // required to manipulate them afterwards.
-          
-        //    // we cannot use JsonConvert's ExpandoObject cloning - that will
-        //    // remove all type information (if there is any)
-        //    //dynamic clonedObject = JsonConvert.DeserializeObject<ExpandoObject>
-        //    //    (JsonConvert.SerializeObject(objectToCreateNewObjectFrom));
-
-        //    dynamic expandoObjectToApplyTo = new ExpandoObject();
-        //    var propertyDictionary = (IDictionary<String, Object>)(expandoObjectToApplyTo);
-
-        //    foreach (PropertyInfo propertyInfo in
-        //        objectToCreateNewObjectFrom.GetType().GetProperties())
-        //    {
-        //        propertyDictionary[propertyInfo.Name] = propertyInfo.GetValue(objectToCreateNewObjectFrom, null);
-        //    }             
-
-        //    // apply each operation in order
-        //    foreach (var op in Operations)
-        //    {              
-        //        op.Apply((ExpandoObject)expandoObjectToApplyTo, adapter);
-
-        //    }
-
-        //    return expandoObjectToApplyTo;
-             
-
-        //}
-
-
-         
+        } 
 
     }
 }
