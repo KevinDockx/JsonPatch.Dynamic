@@ -11,10 +11,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class MoveOperationTests
     {
-        // todo: move from dynami to dyamic, from normal to dynamic, from dynamic to normal
-
-
-
+        
         [Fact]
         public void Move()
         {

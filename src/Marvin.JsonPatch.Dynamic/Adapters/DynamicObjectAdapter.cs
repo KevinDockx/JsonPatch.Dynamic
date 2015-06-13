@@ -563,30 +563,50 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
         }
 
-
-
-
+        
         public void Move(Operation operation, dynamic objectToApplyTo)
         {
 
-            // get value at from location
-            object valueAtFromLocation = null;
-            var positionAsInteger = -1;
-            var actualFromProperty = operation.from;
+            var valueAtFromLocation = GetValueAtLocation(operation.from, objectToApplyTo, operation);
 
-            positionAsInteger = PropertyHelpers.GetNumericEnd(operation.from);
+            // remove that value
+            Remove(operation.from, objectToApplyTo, operation);
+
+            // add that value to the path location
+            Add(operation.path, valueAtFromLocation, objectToApplyTo, operation);
+
+        }
+
+
+
+        public void Copy(Operation operation, dynamic objectToApplyTo)
+        {
+            
+            // get value at from location and add that value to the path location
+            Add(operation.path, GetValueAtLocation(operation.from, objectToApplyTo, operation)
+                , objectToApplyTo, operation);
+        }
+
+
+
+        private object GetValueAtLocation(string location, dynamic objectToGetValueFrom, Operation operationToReport)
+        {
+            // get value from "objectToGetValueFrom" at location "location"
+            object valueAtLocation = null;
+            var positionAsInteger = -1;
+            var actualFromProperty = location;
+
+            positionAsInteger = PropertyHelpers.GetNumericEnd(location);
 
             if (positionAsInteger > -1)
             {
-                actualFromProperty = operation.from.Substring(0,
-                    operation.from.LastIndexOf('/' + positionAsInteger.ToString()));
+                actualFromProperty = location.Substring(0,
+                    location.LastIndexOf('/' + positionAsInteger.ToString()));
             }
+ 
+            // first, analyze the tree. 
 
-            // get the property at the from location.
-
-            // first, analyze the tree.
-
-            var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualFromProperty);
+            var result = new ObjectTreeAnalysisResult(objectToGetValueFrom, actualFromProperty);
 
             if (result.UseDynamicLogic)
             {
@@ -613,35 +633,35 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                             if (positionAsInteger < array.Count)
                             {
-                                valueAtFromLocation = array[positionAsInteger];
+                                valueAtLocation = array[positionAsInteger];
                             }
                             else
                             {
-                                throw new Dynamic.Exceptions.JsonPatchException(operation,
-                              string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
-                                objectToApplyTo, 422);
+                                throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                              string.Format("Patch failed: property at location from: {0} does not exist", location),
+                                objectToGetValueFrom, 422);
                             }
 
                         }
                         else
                         {
-                            throw new Dynamic.Exceptions.JsonPatchException(operation,
-                                  string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", operation.from),
-                                    objectToApplyTo, 422);
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                  string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", location),
+                                    objectToGetValueFrom, 422);
                         }
                     }
                     else
                     {
                         // get the value
-                        valueAtFromLocation =
+                        valueAtLocation =
                             result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
                     }
                 }
                 else
                 {
-                    throw new Dynamic.Exceptions.JsonPatchException(operation,
-                    string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
-                    objectToApplyTo, 422);
+                    throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                    string.Format("Patch failed: property at location from: {0} does not exist", location),
+                    objectToGetValueFrom, 422);
                 }
             }
             else
@@ -677,30 +697,30 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         }
                         else
                         {
-                            throw new Dynamic.Exceptions.JsonPatchException(operation,
-                                 string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
-                                   objectToApplyTo, 422);
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                 string.Format("Patch failed: property at location from: {0} does not exist", location),
+                                   objectToGetValueFrom, 422);
                         }
 
                         // specified index must not be greater than the amount of items in the
                         // array
                         if (positionAsInteger < array.Count)
                         {
-                            valueAtFromLocation = array[positionAsInteger];
+                            valueAtLocation = array[positionAsInteger];
                         }
                         else
                         {
 
-                            throw new Dynamic.Exceptions.JsonPatchException(operation,
-                          string.Format("Patch failed: property at location from: {0} does not exist", operation.from),
-                            objectToApplyTo, 422);
+                            throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                          string.Format("Patch failed: property at location from: {0} does not exist", location),
+                            objectToGetValueFrom, 422);
                         }
                     }
                     else
                     {
-                        throw new Dynamic.Exceptions.JsonPatchException(operation,
-                                 string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", operation.from),
-                                   objectToApplyTo, 422);
+                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                                 string.Format("Patch failed: provided from path is invalid for array property type at location from: {0}: expected array", location),
+                                   objectToGetValueFrom, 422);
                     }
 
 
@@ -712,26 +732,19 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                     if (getResult.CanGet)
                     {
-                        valueAtFromLocation = getResult.Value;
+                        valueAtLocation = getResult.Value;
                     }
                     else
                     {
-                        throw new Dynamic.Exceptions.JsonPatchException(operation,
-                       string.Format("Patch failed: property at location from: {0} does not exist or cannot be accessed.", operation.from),
-                       objectToApplyTo, 422);
+                        throw new Dynamic.Exceptions.JsonPatchException(operationToReport,
+                       string.Format("Patch failed: property at location from: {0} does not exist or cannot be accessed.", location),
+                       objectToGetValueFrom, 422);
                     }
                 }
             }
 
-
-            // remove that value
-
-            Remove(operation.from, objectToApplyTo, operation);
-
-            // add that value to the path location
-
-            Add(operation.path, valueAtFromLocation, objectToApplyTo, operation);
-
+            return valueAtLocation;
         }
+
     }
 }

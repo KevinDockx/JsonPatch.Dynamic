@@ -99,6 +99,13 @@ namespace Marvin.JsonPatch.Dynamic
             return this;
         }
 
+         
+
+        public JsonPatchDocument Copy(string from, string path)
+        {
+            Operations.Add(new Operation("copy", path, from));
+            return this;
+        }
 
 
 

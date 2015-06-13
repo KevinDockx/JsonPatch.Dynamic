@@ -41,9 +41,9 @@ namespace Marvin.JsonPatch.Dynamic.Operations
                 case OperationType.Move:
                     adapter.Move(operation, objectToApplyTo);
                     break;
-                //case OperationType.Copy:
-                //    adapter.Copy(this, objectToApplyTo);
-                //    break;
+                case OperationType.Copy:
+                    adapter.Copy(operation, objectToApplyTo);
+                    break;
                 //case OperationType.Test:
                 //    adapter.Test(this, objectToApplyTo);
                 //    break;

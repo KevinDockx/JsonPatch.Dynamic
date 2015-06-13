@@ -61,6 +61,8 @@
   <ItemGroup>
     <Compile Include="AddOperationTests.cs" />
     <Compile Include="AddTypedOperationTests.cs" />
+    <Compile Include="CopyOperationTests.cs" />
+    <Compile Include="CopyTypedOperationTests.cs" />
     <Compile Include="MoveOperationTests.cs" />
     <Compile Include="MoveTypedOperationTests.cs" />
     <Compile Include="NestedDTO.cs" />
