@@ -5,15 +5,10 @@
 //
 // Enjoy :-)
 
-using Marvin.JsonPatch.Dynamic.Helpers;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic; 
-using System.Dynamic;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -81,43 +76,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
              
         }
 
-
-        
-        //internal static PropertyInfo FindProperty(object targetObject, string propertyPath)
-        //{
-        //    try
-        //    {
-
-        //        var splitPath = propertyPath.Split('/');
-
-        //        // skip the first one if it's empty
-        //        var startIndex = (string.IsNullOrWhiteSpace(splitPath[0]) ? 1 : 0);
-
-        //        for (int i = startIndex; i < splitPath.Length - 1; i++)
-        //        {
-        //            var propertyInfoToGet = GetPropertyInfo(targetObject, splitPath[i]
-        //                , BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-        //            // todo: check if this targetobject is an expandoobject or not - if expando
-        //            // (or IM
-        //            targetObject = propertyInfoToGet.GetValue(targetObject, null);
-        //        }
-
-
-        //        var propertyToFind = targetObject.GetType().GetProperty(splitPath.Last(),
-        //                BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-        //        return propertyToFind;
-
-
-        //    }
-        //    catch (Exception)
-        //    {
-        //        // will result in JsonPatchException in calling class, as expected
-        //        return null;
-        //    }
-        //}
-
+         
 
         internal static ConversionResult ConvertToActualType(Type propertyType, object value)
         {

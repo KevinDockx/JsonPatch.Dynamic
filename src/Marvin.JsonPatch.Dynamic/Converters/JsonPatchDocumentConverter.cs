@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Exceptions;
 using Marvin.JsonPatch.Operations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -57,8 +62,7 @@ namespace Marvin.JsonPatch.Dynamic.Converters
             }
             catch (Exception ex)
             {
-                // TODO correct exception! (statuscode)
-                throw new JsonPatchException("The JsonPatchDocument was malformed and could not be parsed.", ex);
+                throw new JsonPatchException("The JsonPatchDocument was malformed and could not be parsed.", ex, 400);
             }
 
         }

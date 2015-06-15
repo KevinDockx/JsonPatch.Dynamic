@@ -8,9 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -210,8 +207,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         }
 
         private object GetElementAtFromObject(object targetObject, int numericValue)
-        {
-            
+        {            
             if (numericValue > -1)
             {
                 // Check if the targetobject is an IEnumerable,

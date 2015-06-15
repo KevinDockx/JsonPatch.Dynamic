@@ -3,21 +3,14 @@
 //
 // Enjoy :-)
 
-using Marvin.JsonPatch.Adapters;
-using Marvin.JsonPatch.Operations;
-using Marvin.JsonPatch.Dynamic.Operations;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Marvin.JsonPatch.Dynamic.Adapters;
-using System.Linq.Expressions;
-using Marvin.JsonPatch.Dynamic.Helpers;
-using Marvin.JsonPatch.Exceptions;
 using Marvin.JsonPatch.Dynamic.Converters;
+using Marvin.JsonPatch.Dynamic.Helpers;
+using Marvin.JsonPatch.Dynamic.Operations;
+using Marvin.JsonPatch.Exceptions;
+using Marvin.JsonPatch.Operations;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Marvin.JsonPatch.Dynamic
 {
@@ -49,7 +42,7 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          path), null);
+                          path));
             }
  
             Operations.Add(new Operation("add", checkPathResult.AdjustedPath, null, value));
@@ -63,7 +56,7 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          path), null);
+                          path));
             }
  
             Operations.Add(new Operation("remove", checkPathResult.AdjustedPath, null, null));
@@ -77,7 +70,7 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          path), null);
+                          path));
             }
  
             Operations.Add(new Operation("replace", checkPathResult.AdjustedPath, null, value));
@@ -93,14 +86,14 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          path), null);
+                          path));
             }
 
             if (!checkFromResult.IsCorrectlyFormedPath)
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          from), null);
+                          from));
             }
 
 
@@ -117,14 +110,14 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          path), null);
+                          path));
             }
 
             if (!checkFromResult.IsCorrectlyFormedPath)
             {
                 throw new JsonPatchException(
                    string.Format("Provided string is not a valid path: {0}",
-                          from), null);
+                          from));
             }
 
             Operations.Add(new Operation("copy", checkPathResult.AdjustedPath, checkFromResult.AdjustedPath));

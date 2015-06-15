@@ -1,4 +1,4 @@
-﻿using Marvin.JsonPatch.Dynamic.Exceptions;
+﻿using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
