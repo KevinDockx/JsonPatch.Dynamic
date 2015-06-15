@@ -4,11 +4,13 @@
 // Enjoy :-)
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -87,22 +89,47 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 }
                 else
                 {
-                    // find the value through reflection
-                    var propertyInfoToGet = GetPropertyInfo(targetObject, propertyPathTree[i]
-                   , BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    // if the current part of the path is numeric, this means we're trying
+                    // to get the propertyInfo of a specific object in an array.  To allow
+                    // for this, the previous value (targetObject) must be an IEnumerable, and
+                    // the position must exist.
 
-                    if (propertyInfoToGet == null)
+                    int numericValue = -1;
+                    if (int.TryParse(propertyPathTree[i], out numericValue))
                     {
-                        // property cannot be found, and we're not working with dynamics.  Stop, and return invalid path.
-                        break;
+                        var element = GetElementAtFromObject(targetObject, numericValue);
+                        if (element != null)
+                        {
+                            targetObject = element;
+                        }
+                        else
+                        { 
+                            break; 
+                        }
+
                     }
                     else
                     {
-                        // unless we're at the last item, we should continue searching.
-                        // If we're at the last item, we need to stop
-                        if (!(i == propertyPathTree.Count - 1))
-                        {                          
-                            targetObject = propertyInfoToGet.GetValue(targetObject, null);
+
+
+                        // find the value through reflection
+                        var propertyInfoToGet = GetPropertyInfo(targetObject, propertyPathTree[i]
+                       , BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                        if (propertyInfoToGet == null)
+                        {
+                            // property cannot be found, and we're not working with dynamics.  
+                            // Stop, and return invalid path.
+                            break;
+                        }
+                        else
+                        {
+                            // unless we're at the last item, we should continue searching.
+                            // If we're at the last item, we need to stop
+                            if (!(i == propertyPathTree.Count - 1))
+                            {
+                                targetObject = propertyInfoToGet.GetValue(targetObject, null);
+                            }
                         }
                     }
                 } 
@@ -180,6 +207,28 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 }
             }
              
+        }
+
+        private object GetElementAtFromObject(object targetObject, int numericValue)
+        {
+            
+            if (numericValue > -1)
+            {
+                // Check if the targetobject is an IEnumerable,
+                // and if the position is valid.
+                if (targetObject is IEnumerable)
+                {
+                    var indexable = ((IEnumerable)targetObject).Cast<object>();
+
+                    if (indexable.Count() >= numericValue)
+                    {
+                        return indexable.ElementAt(numericValue);
+                    }
+                    else { return null; }
+                }
+                else { return null; ; }
+            }
+            else { return null; }
         }
 
 

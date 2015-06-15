@@ -201,12 +201,36 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             deserialized.ApplyTo(doc);
 
-            Assert.Equal(4, doc.SimpleDTOList.First().IntegerList.First());
+            Assert.Equal(4, doc.SimpleDTOList[0].IntegerList[0]);
         }
 
 
 
-        public void ReplaceInListInListInvalidPosition()
+        [Fact]
+        public void ReplaceInListInListAtEnd()
+        {
+            dynamic doc = new ExpandoObject();
+            doc.SimpleDTOList = new List<SimpleDTO>() { 
+                new SimpleDTO() {
+                    IntegerList = new List<int>(){1,2,3}
+                }};
+
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Replace("SimpleDTOList/0/IntegerList/-", 4);
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            deserialized.ApplyTo(doc);
+
+            Assert.Equal(4, doc.SimpleDTOList[0].IntegerList[2]);
+        }
+
+
+
+        public void ReplaceInListInListInvalidPositionTooLarge()
         {
             dynamic doc = new ExpandoObject();
             doc.SimpleDTOList = new List<SimpleDTO>() { 
@@ -216,7 +240,28 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Replace("SimpleDTOList/0/IntegerList/10", 4);
+            patchDoc.Replace("SimpleDTOList/10/IntegerList/0", 4);
+
+            var serialized = JsonConvert.SerializeObject(patchDoc);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+
+
+        }
+
+        public void ReplaceInListInListInvalidPositionTooSmall()
+        {
+            dynamic doc = new ExpandoObject();
+            doc.SimpleDTOList = new List<SimpleDTO>() { 
+                new SimpleDTO() {
+                    IntegerList = new List<int>(){1,2,3}
+                }};
+
+            // create patch
+            JsonPatchDocument patchDoc = new JsonPatchDocument();
+            patchDoc.Replace("SimpleDTOList/-20/IntegerList/0", 4);
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);

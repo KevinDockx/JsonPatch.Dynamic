@@ -17,10 +17,13 @@ using Marvin.JsonPatch.Dynamic.Adapters;
 using System.Linq.Expressions;
 using Marvin.JsonPatch.Dynamic.Helpers;
 using Marvin.JsonPatch.Exceptions;
+using Marvin.JsonPatch.Dynamic.Converters;
 
 namespace Marvin.JsonPatch.Dynamic
 {
-    public class JsonPatchDocument
+    
+    [JsonConverter(typeof(JsonPatchDocumentConverter))]
+    public class JsonPatchDocument : IJsonPatchDocument
     {
 
         public List<Operation> Operations { get; private set; }
@@ -150,7 +153,31 @@ namespace Marvin.JsonPatch.Dynamic
                 op.Apply(objectToApplyTo, adapter);
             }
 
-        } 
+        }
 
+
+        // return a copy - original operations should not
+        // be editable through this.
+        public List<Operation> GetOperations()
+        {
+            var allOps = new List<Operation>();
+
+            if (Operations != null)
+            {
+                foreach (var op in Operations)
+                {
+                    var untypedOp = new Operation();
+
+                    untypedOp.op = op.op;
+                    untypedOp.value = op.value;
+                    untypedOp.path = op.path;
+                    untypedOp.from = op.from;
+
+                    allOps.Add(untypedOp);
+                }
+            }
+
+            return allOps;
+        }
     }
 }

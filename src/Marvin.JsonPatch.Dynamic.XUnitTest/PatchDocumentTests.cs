@@ -3,7 +3,8 @@
 //
 // Enjoy :-)
 
-using Marvin.JsonPatch.Dynamic.Exceptions;
+
+using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -81,11 +82,17 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 AnotherStringProperty = "B"
             };
 
-            JsonPatchDocument<SimpleDTO> patchDoc = new JsonPatchDocument<SimpleDTO>();
-            patchDoc.Copy<string>(o => o.StringProperty, o => o.AnotherStringProperty);
+            JsonPatchDocument<SimpleDTO> patchDocTyped = new JsonPatchDocument<SimpleDTO>();
+            patchDocTyped.Copy<string>(o => o.StringProperty, o => o.AnotherStringProperty);
 
-            var serialized = JsonConvert.SerializeObject(patchDoc);
-            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
+
+            JsonPatchDocument patchDocUntyped = new JsonPatchDocument();
+            patchDocUntyped.Copy("StringProperty", "AnotherStringProperty");
+
+
+            var serializedTyped = JsonConvert.SerializeObject(patchDocTyped);
+            var serializedUntyped = JsonConvert.SerializeObject(patchDocUntyped);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serializedTyped);
 
             deserialized.ApplyTo(doc);
 
