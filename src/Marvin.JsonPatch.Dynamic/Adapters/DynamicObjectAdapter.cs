@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Marvin.JsonPatch.Dynamic.Adapters
 {
-    public class DynamicObjectAdapter : IDynamicObjectAdapter
+    internal class DynamicObjectAdapter : IDynamicObjectAdapter
     {
 
         /// <summary>
