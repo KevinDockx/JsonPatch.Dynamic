@@ -20,8 +20,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             PropertyToSet = propertyToSet;
             CanSet = canSet;
             Success = success;
-        }
-
-
+        } 
     }
 }

@@ -87,8 +87,8 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         }
 
 
-        internal static bool ContainsKeyCaseInsensitive(this IDictionary<String, Object> propertyDictionary,
-       string key)
+             internal static bool ContainsCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+        string key)
         {
             key = key.ToLower();
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
@@ -96,7 +96,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 if (kvp.Key.ToLower() == key)
                 {
                     return true;
-                    // return kvp;
                 }
             }
             return false;

@@ -59,7 +59,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             {
                 if (result.IsValidPathForAdd)
                 {
-                    if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInParent))
+                    if (result.Container.ContainsCaseInsensitiveKey(result.PropertyPathInParent))
                     {
                         // Existing property.  
                         // If it's not an array, we need to check if the value fits the property type
@@ -607,7 +607,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             if (result.UseDynamicLogic)
             {
                 // find the property
-                if (result.Container.ContainsKeyCaseInsensitive(result.PropertyPathInParent))
+                if (result.Container.ContainsCaseInsensitiveKey(result.PropertyPathInParent))
                 {
                     if (positionAsInteger > -1)
                     {

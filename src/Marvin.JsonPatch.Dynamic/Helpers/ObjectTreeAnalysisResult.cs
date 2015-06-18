@@ -68,21 +68,25 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 if (targetObject is IDictionary<String, Object>)
                 {
                     // find the value in the dictionary
-                    var possibleNewTargetObject =  (targetObject as IDictionary<String, Object>)
-                        .GetValueForCaseInsensitiveKeyTest(propertyPathTree[i]);
-                    if (possibleNewTargetObject == null)
+                   
+                    if ((targetObject as IDictionary<string, object>)
+                        .ContainsCaseInsensitiveKey(propertyPathTree[i]))
                     {
-                        break;
-                    }
-                    else
-                    {
+                        var possibleNewTargetObject = (targetObject as IDictionary<String, Object>)
+                       .GetValueForCaseInsensitiveKey(propertyPathTree[i]);
+
                         // unless we're at the last item, we should set the targetobject
                         // to the new object.  If we're at the last item, we need to stop
-                        if (!(i == propertyPathTree.Count-1))
-                        {                           
+                        if (!(i == propertyPathTree.Count - 1))
+                        {
                             targetObject = possibleNewTargetObject;
                         } 
                     }
+                    else
+                    {
+                        break;
+                    }
+                     
                 }
                 else
                 {
@@ -157,7 +161,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                     // to be able to remove this property, it must exist
 
-                    IsValidPathForRemove = Container.ContainsKeyCaseInsensitive(PropertyPathInParent);
+                    IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(PropertyPathInParent);
                  
                 }
                 else
