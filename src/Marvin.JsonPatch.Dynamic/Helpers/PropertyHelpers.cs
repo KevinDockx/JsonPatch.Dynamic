@@ -109,24 +109,19 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
 
 
-        internal static int GetNumericEnd(string path)
+        internal static CheckNumericEndResult GetNumericEnd(string path)
         {
             var possibleIndex = path.Substring(path.LastIndexOf("/") + 1);
-
-            return GetNumeric(possibleIndex);
-        }
-
-
-        internal static int GetNumeric(string path)
-        {          
             int castedIndex = -1;
-            if (int.TryParse(path, out castedIndex))
+            if (int.TryParse(possibleIndex, out castedIndex))
             {
-                return castedIndex;
+                return new CheckNumericEndResult(true, castedIndex);              
             }
 
-            return -1;
+            return new CheckNumericEndResult(false, null);
         }
+
+  
 
 
         private static PropertyInfo GetPropertyInfo(object targetObject, string propertyName,

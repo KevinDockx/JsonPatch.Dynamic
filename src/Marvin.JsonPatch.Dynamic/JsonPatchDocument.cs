@@ -10,6 +10,7 @@ using Marvin.JsonPatch.Dynamic.Operations;
 using Marvin.JsonPatch.Exceptions;
 using Marvin.JsonPatch.Operations;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Marvin.JsonPatch.Dynamic
@@ -21,10 +22,14 @@ namespace Marvin.JsonPatch.Dynamic
 
         public List<Operation> Operations { get; private set; }
 
+        [JsonIgnore]
+        public IContractResolver ContractResolver { get; set; }
+
 
         public JsonPatchDocument()
         {
             Operations = new List<Operation>();
+            ContractResolver = new DefaultContractResolver();
         }
 
 
@@ -32,7 +37,7 @@ namespace Marvin.JsonPatch.Dynamic
         public JsonPatchDocument(List<Operation> operations)
         {
             Operations = operations;
-
+            ContractResolver = new DefaultContractResolver();
         }
 
         public JsonPatchDocument Add(string path, object value)

@@ -3,6 +3,7 @@
 //
 // Enjoy :-)
 
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,18 +29,22 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
         public string PropertyPath { get; private set; }
 
-        public PropertyInfo PropertyInfo { get; private set; }
+   //     public PropertyInfo PropertyInfo { get; private set; }
 
         public object OriginalObject { get; private set; }
 
         public object ParentObject { get; private set; }
+        
+        public IContractResolver ContractResolver { get; private set; }
 
-        public ObjectTreeAnalysisResult(object objectToSearch, string propertyPath)
+        public JsonPatchProperty JsonPatchProperty { get; private set; }
+
+        public ObjectTreeAnalysisResult(object objectToSearch, string propertyPath
+            , IContractResolver contractResolver)
         {
             PropertyPath = propertyPath;
             OriginalObject = objectToSearch;
-
-            // analyze the tree
+            ContractResolver = contractResolver;
 
             AnalyzeTree();
         }
@@ -63,12 +68,14 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             int lastPosition = 0;
             for (int i = 0; i < propertyPathTree.Count; i++)
             {
-                // if the current target object is an ExpandoObject
+                // if the current target object is an ExpandoObject (IDictionary<string, object>),
+                // we cannot use the ContractResolver.
+
                 lastPosition = i;
                 if (targetObject is IDictionary<String, Object>)
                 {
-                    // find the value in the dictionary
-                   
+                    
+                    // find the value in the dictionary                   
                     if ((targetObject as IDictionary<string, object>)
                         .ContainsCaseInsensitiveKey(propertyPathTree[i]))
                     {
@@ -112,26 +119,50 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     else
                     {
 
+                        var jsonContract = (JsonObjectContract)ContractResolver
+                            .ResolveContract(targetObject.GetType());
 
-                        // find the value through reflection
-                        var propertyInfoToGet = GetPropertyInfo(targetObject, propertyPathTree[i]
-                       , BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        // does the property exist?
+                        var attemptedProperty = jsonContract.Properties.FirstOrDefault
+                            (p => string.Equals(p.PropertyName, propertyPathTree[i]
+                                , StringComparison.OrdinalIgnoreCase));
 
-                        if (propertyInfoToGet == null)
-                        {
-                            // property cannot be found, and we're not working with dynamics.  
-                            // Stop, and return invalid path.
-                            break;
-                        }
-                        else
+                        if (attemptedProperty != null)
                         {
                             // unless we're at the last item, we should continue searching.
                             // If we're at the last item, we need to stop
                             if (!(i == propertyPathTree.Count - 1))
                             {
-                                targetObject = propertyInfoToGet.GetValue(targetObject, null);
+                                targetObject = attemptedProperty.ValueProvider.GetValue(targetObject);
                             }
                         }
+                        else
+                        {
+                            // property cannot be found, and we're not working with dynamics.  
+                            // Stop, and return invalid path.
+                            break;
+                        }
+ 
+                         
+                       // // find the value through reflection
+                       // var propertyInfoToGet = GetPropertyInfo(targetObject, propertyPathTree[i]
+                       //, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                       // if (propertyInfoToGet == null)
+                       // {
+                       //     // property cannot be found, and we're not working with dynamics.  
+                       //     // Stop, and return invalid path.
+                       //     break;
+                       // }
+                       // else
+                       // {
+                       //     // unless we're at the last item, we should continue searching.
+                       //     // If we're at the last item, we need to stop
+                       //     if (!(i == propertyPathTree.Count - 1))
+                       //     {
+                       //         targetObject = propertyInfoToGet.GetValue(targetObject, null);
+                       //     }
+                       // }
                     }
                 } 
             }
@@ -160,9 +191,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     PropertyPathInParent = leftOverPath.Last();
 
                     // to be able to remove this property, it must exist
-
-                    IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(PropertyPathInParent);
-                 
+                    IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(PropertyPathInParent);                 
                 }
                 else
                 {
@@ -179,14 +208,15 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 UseDynamicLogic = false;
 
                 if (leftOverPath.Count == 1)
-                {
+                { 
+                    var jsonContract = (JsonObjectContract)ContractResolver
+                        .ResolveContract(targetObject.GetType());
+
+                    var attemptedProperty = jsonContract.Properties.FirstOrDefault
+                            (p => string.Equals(p.PropertyName, leftOverPath.Last()
+                                , StringComparison.OrdinalIgnoreCase));
                     
-                    // Get the property
-                    var propertyToFind = targetObject.GetType().GetProperty(leftOverPath.Last(),
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    
-                
-                    if (propertyToFind == null)
+                    if (attemptedProperty == null)
                     {
                         IsValidPathForAdd = false;
                         IsValidPathForRemove = false;
@@ -195,11 +225,36 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     {
                         IsValidPathForAdd = true;
                         IsValidPathForRemove = true;
-                        PropertyInfo = propertyToFind;
+
+                        JsonPatchProperty = new Helpers.JsonPatchProperty(attemptedProperty, targetObject);
+
+                    //    PropertyInfo = targetObject.GetType().GetProperty(leftOverPath.Last(),
+                    //BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance); ;
                         PropertyPathInParent = leftOverPath.Last();
                         ParentObject = targetObject;
-
                     }
+                    //}
+
+               
+                    //// Get the property
+                    //var propertyToFind = targetObject.GetType().GetProperty(leftOverPath.Last(),
+                    //BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    
+                
+                    //if (propertyToFind == null)
+                    //{
+                    //    IsValidPathForAdd = false;
+                    //    IsValidPathForRemove = false;
+                    //}
+                    //else
+                    //{
+                    //    IsValidPathForAdd = true;
+                    //    IsValidPathForRemove = true;
+                    //    PropertyInfo = propertyToFind;
+                    //    PropertyPathInParent = leftOverPath.Last();
+                    //    ParentObject = targetObject;
+
+                    //}
                 }
                 else
                 {

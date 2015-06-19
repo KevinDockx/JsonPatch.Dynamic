@@ -50,11 +50,13 @@
     <Compile Include="Adapters\IDynamicObjectAdapter.cs" />
     <Compile Include="Adapters\DynamicObjectAdapter.cs" />
     <Compile Include="Converters\JsonPatchDocumentConverter.cs" />
+    <Compile Include="Helpers\CheckNumericEndResult.cs" />
     <Compile Include="Helpers\CheckPathResult.cs" />
     <Compile Include="Helpers\ConversionResult.cs" />
     <Compile Include="Helpers\DynamicPropertyHelpers.cs" />
     <Compile Include="Helpers\ExpandoObjectDictionaryExtensions.cs" />
     <Compile Include="Helpers\GetValueResult.cs" />
+    <Compile Include="Helpers\JsonPatchProperty.cs" />
     <Compile Include="Helpers\ObjectTreeAnalysisResult.cs" />
     <Compile Include="Helpers\PathHelpers.cs" />
     <Compile Include="Helpers\PropertyHelpers.cs" />
