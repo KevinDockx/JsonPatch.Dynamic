@@ -10,7 +10,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal static class ExpandoObjectDictionaryExtensions
     {
-        internal static void SetValueForCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+        internal static void SetValueForCaseInsensitiveKey(this IDictionary<string, object> propertyDictionary,
        string key, object value)
         {
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
@@ -25,7 +25,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         }
 
 
-        internal static void RemoveValueForCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+        internal static void RemoveValueForCaseInsensitiveKey(this IDictionary<string, object> propertyDictionary,
       string key)
         {
             string realKey = "";
@@ -45,7 +45,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         }
 
 
-        internal static object GetValueForCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+        internal static object GetValueForCaseInsensitiveKey(this IDictionary<string, object> propertyDictionary,
           string key)
         {
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
@@ -62,7 +62,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
 
 
-        internal static bool ContainsCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
+        internal static bool ContainsCaseInsensitiveKey(this IDictionary<string, object> propertyDictionary,
    string key)
         {
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)

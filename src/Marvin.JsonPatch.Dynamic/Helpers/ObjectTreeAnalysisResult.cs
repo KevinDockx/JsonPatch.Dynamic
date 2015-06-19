@@ -23,7 +23,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
         public bool IsValidPathForRemove { get; private set; }
 
-        public IDictionary<String, Object> Container { get; private set; }
+        public IDictionary<string, object> Container { get; private set; }
         
         public string PropertyPathInParent {get; private set;}
 
@@ -72,14 +72,14 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 // we cannot use the ContractResolver.
 
                 lastPosition = i;
-                if (targetObject is IDictionary<String, Object>)
+                if (targetObject is IDictionary<string, object>)
                 {
                     
                     // find the value in the dictionary                   
                     if ((targetObject as IDictionary<string, object>)
                         .ContainsCaseInsensitiveKey(propertyPathTree[i]))
                     {
-                        var possibleNewTargetObject = (targetObject as IDictionary<String, Object>)
+                        var possibleNewTargetObject = (targetObject as IDictionary<string, object>)
                        .GetValueForCaseInsensitiveKey(propertyPathTree[i]);
 
                         // unless we're at the last item, we should set the targetobject
@@ -175,9 +175,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             // it can also be a property info.  In that case, if there's nothing left in the path
             // tree we're at the end, if there's one left we can try and set that.  
             //
-            
 
-            if (targetObject is IDictionary<String, Object>)
+
+            if (targetObject is IDictionary<string, object>)
             {
                 var leftOverPath = propertyPathTree
                     .GetRange(lastPosition, propertyPathTree.Count - lastPosition);
@@ -186,7 +186,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                 if (leftOverPath.Count == 1)
                 {
-                    Container = targetObject as IDictionary<String, Object>;                   
+                    Container = targetObject as IDictionary<string, object>;                   
                     IsValidPathForAdd = true;
                     PropertyPathInParent = leftOverPath.Last();
 
