@@ -91,15 +91,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                             var typeOfPathProperty = result.Container
                                 .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
-
-                            var isNonStringArray = !(typeOfPathProperty == typeof(string))
-                                && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
-
-                            // what if it's an array but there's no position??
-                            if (isNonStringArray)
+  
+                            if (PropertyHelpers.IsNonStringArray(typeOfPathProperty))
                             {
                                 // now, get the generic type of the enumerable
-                                var genericTypeOfArray = GetIListType(typeOfPathProperty);
+                                var genericTypeOfArray = PropertyHelpers.GetIListType(typeOfPathProperty);
                                 var conversionResult = PropertyHelpers.ConvertToActualType(genericTypeOfArray, value);
 
                                 if (!conversionResult.CanBeConverted)
@@ -204,10 +200,10 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                 if (appendList || positionAsInteger > -1)
                 {
-                    if (IsNonStringArray(patchProperty.Property.PropertyType))
+                    if (PropertyHelpers.IsNonStringArray(patchProperty.Property.PropertyType))
                     {
                         // now, get the generic type of the IList<> from Property type.
-                        var genericTypeOfArray = GetIListType(patchProperty.Property.PropertyType);
+                        var genericTypeOfArray = PropertyHelpers.GetIListType(patchProperty.Property.PropertyType);
 
                         var conversionResult = PropertyHelpers.ConvertToActualType(genericTypeOfArray, value);
 
@@ -371,14 +367,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                         var typeOfPathProperty = result.Container
                                 .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
-
-                        var isNonStringArray = !(typeOfPathProperty == typeof(string))
-                            && typeof(IList).IsAssignableFrom(typeOfPathProperty);
-
-                        if (isNonStringArray)
+  
+                        if (PropertyHelpers.IsNonStringArray(typeOfPathProperty))
                         {
                             // now, get the generic type of the enumerable
-                            var genericTypeOfArray = GetIListType(typeOfPathProperty);
+                            var genericTypeOfArray = PropertyHelpers.GetIListType(typeOfPathProperty);
 
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
 
@@ -458,12 +451,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 var patchProperty = result.JsonPatchProperty;
 
                 if (removeFromList || positionAsInteger > -1)
-                {
-
-                    if (IsNonStringArray(patchProperty.Property.PropertyType))
+                { 
+                    if (PropertyHelpers.IsNonStringArray(patchProperty.Property.PropertyType))
                     {
                         // now, get the generic type of the IList<> from Property type.
-                        var genericTypeOfArray = GetIListType(patchProperty.Property.PropertyType);
+                        var genericTypeOfArray = PropertyHelpers.GetIListType(patchProperty.Property.PropertyType);
 
                         if (patchProperty.Property.Readable)
                         {
@@ -640,13 +632,10 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         var typeOfPathProperty = result.Container
                             .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
 
-                        var isNonStringArray = !(typeOfPathProperty == typeof(string))
-                            && typeof(IList).GetTypeInfo().IsAssignableFrom(typeOfPathProperty);
-
-                        if (isNonStringArray)
+                        if (PropertyHelpers.IsNonStringArray(typeOfPathProperty))
                         {
                             // now, get the generic type of the enumerable
-                            var genericTypeOfArray = GetIListType(typeOfPathProperty);
+                            var genericTypeOfArray = PropertyHelpers.GetIListType(typeOfPathProperty);
 
                             // get value
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
@@ -695,7 +684,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                 // the path must end with "/position" or "/-", which we already determined before. 
                 if (positionAsInteger > -1)
                 {
-                    if (IsNonStringArray(patchProperty.Property.PropertyType))
+                    if (PropertyHelpers.IsNonStringArray(patchProperty.Property.PropertyType))
                     {
                         // now, get the generic type of the enumerable
                         //var genericTypeOfArray = GetIListType(patchProperty.Property.PropertyType);
@@ -754,51 +743,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         }
 
 
-        private bool IsNonStringArray(Type type)
-        {
-            if (GetIListType(type) != null)
-            {
-                return true;
-            }
-
-            return (!(type == typeof(string)) && typeof(IList)
-                .GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()));
-        }
-
-        private Type GetIListType(Type type)
-        {
-            if (type == null)
-                throw new ArgumentException("Parameter type cannot be null");
-
-            if (IsGenericListType(type))
-            {
-                return type.GetGenericArguments()[0];
-            }
-
-            foreach (Type interfaceType in type.GetTypeInfo().ImplementedInterfaces)
-            {
-                if (IsGenericListType(interfaceType))
-                {
-                    return interfaceType.GetGenericArguments()[0];
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsGenericListType(Type type)
-        {
-            if (type == null)
-                throw new ArgumentException("Parameter type cannot be null");
-
-            if (type.GetTypeInfo().IsGenericType &&
-                    type.GetGenericTypeDefinition() == typeof(IList<>))
-            {
-                return true;
-            }
-
-            return false;
-        }
+     
 
     }
 

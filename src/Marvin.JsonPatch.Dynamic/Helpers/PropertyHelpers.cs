@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -37,6 +38,52 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             }
 
             return new CheckNumericEndResult(false, null);
+        }
+
+        internal static bool IsNonStringArray(Type type)
+        {
+            if (GetIListType(type) != null)
+            {
+                return true;
+            }
+
+            return (!(type == typeof(string)) && typeof(IList)
+                .GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()));
+        }
+
+        internal static Type GetIListType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentException("Parameter type cannot be null");
+
+            if (IsGenericListType(type))
+            {
+                return type.GetGenericArguments()[0];
+            }
+
+            foreach (Type interfaceType in type.GetTypeInfo().ImplementedInterfaces)
+            {
+                if (IsGenericListType(interfaceType))
+                {
+                    return interfaceType.GetGenericArguments()[0];
+                }
+            }
+
+            return null;
+        }
+
+        internal static bool IsGenericListType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentException("Parameter type cannot be null");
+
+            if (type.GetTypeInfo().IsGenericType &&
+                    type.GetGenericTypeDefinition() == typeof(IList<>))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
