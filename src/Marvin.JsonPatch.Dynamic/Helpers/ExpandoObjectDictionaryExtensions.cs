@@ -16,7 +16,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             key = key.ToLower();
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
             {
-                if (kvp.Key.ToLower() == key)
+                if (string.Equals(kvp.Key.ToLower(), key, StringComparison.OrdinalIgnoreCase))          
                 {
                     propertyDictionary[kvp.Key] = value;
                     break;
@@ -33,21 +33,17 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             key = key.ToLower();
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
             {
-                if (kvp.Key.ToLower() == key)
+                if (string.Equals(kvp.Key.ToLower(), key, StringComparison.OrdinalIgnoreCase))
                 {
                     realKey = kvp.Key; 
-                    break;
-                    // return kvp;
+                    break; 
                 }
             }
             
             if (realKey != "")
             {
                 propertyDictionary.Remove(realKey);
-            }
-
-             
-
+            } 
         }
 
 
@@ -57,10 +53,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             key = key.ToLower();
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
             {
-                if (kvp.Key.ToLower() == key)
+                if (string.Equals(kvp.Key.ToLower(), key, StringComparison.OrdinalIgnoreCase))
                 {
                     return kvp.Value;
-
                 }
             }
 
@@ -69,31 +64,14 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
         
 
-
-             internal static object GetValueForCaseInsensitiveKeyTest(this IDictionary<String, Object> propertyDictionary,
-          string key)
-        {
-            key = key.ToLower();
-            foreach (KeyValuePair<string, object> kvp in propertyDictionary)
-            {
-                if (kvp.Key.ToLower() == key)
-                {
-                    return kvp.Value;
-
-                }
-            }
-                 return null;
-
-        }
-
-
+         
              internal static bool ContainsCaseInsensitiveKey(this IDictionary<String, Object> propertyDictionary,
         string key)
         {
             key = key.ToLower();
             foreach (KeyValuePair<string, object> kvp in propertyDictionary)
             {
-                if (kvp.Key.ToLower() == key)
+                if (string.Equals(kvp.Key.ToLower(), key, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
