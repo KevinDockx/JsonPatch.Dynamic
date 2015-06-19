@@ -99,8 +99,8 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                             if (isNonStringArray)
                             {
                                 // now, get the generic type of the enumerable
-                                var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
-                                var conversionResult = DynamicPropertyHelpers.ConvertToActualType(genericTypeOfArray, value);
+                                var genericTypeOfArray = GetIListType(typeOfPathProperty);
+                                var conversionResult = PropertyHelpers.ConvertToActualType(genericTypeOfArray, value);
 
                                 if (!conversionResult.CanBeConverted)
                                 {
@@ -156,7 +156,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
                             // can the value be converted to the actual type?
                             var conversionResultTuple =
-                                DynamicPropertyHelpers.ConvertToActualType(typeOfPathProperty, value);
+                                PropertyHelpers.ConvertToActualType(typeOfPathProperty, value);
 
                             // conversion successful
                             if (conversionResultTuple.CanBeConverted)
@@ -378,7 +378,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         if (isNonStringArray)
                         {
                             // now, get the generic type of the enumerable
-                            var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
+                            var genericTypeOfArray = GetIListType(typeOfPathProperty);
 
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
 
@@ -646,7 +646,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                         if (isNonStringArray)
                         {
                             // now, get the generic type of the enumerable
-                            var genericTypeOfArray = DynamicPropertyHelpers.GetEnumerableType(typeOfPathProperty);
+                            var genericTypeOfArray = GetIListType(typeOfPathProperty);
 
                             // get value
                             var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
