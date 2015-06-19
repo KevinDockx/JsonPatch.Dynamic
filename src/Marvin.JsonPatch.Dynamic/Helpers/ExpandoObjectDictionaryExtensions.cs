@@ -75,7 +75,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             return false;
 
         }
-
-
+         
     }
 }

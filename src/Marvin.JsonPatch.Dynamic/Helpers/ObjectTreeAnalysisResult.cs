@@ -15,7 +15,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
     internal class ObjectTreeAnalysisResult
     {
         // either the property is part of the container dictionary,
-        // or we have a direct reference to its propertyinfo
+        // or we have a direct reference to a JsonPatchProperty instance
            
         public bool UseDynamicLogic { get; private set; }
 
@@ -26,37 +26,19 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         public IDictionary<string, object> Container { get; private set; }
         
         public string PropertyPathInParent {get; private set;}
-
-        public string PropertyPath { get; private set; }
-
-   //     public PropertyInfo PropertyInfo { get; private set; }
-
-        public object OriginalObject { get; private set; }
-
-        public object ParentObject { get; private set; }
         
-        public IContractResolver ContractResolver { get; private set; }
-
         public JsonPatchProperty JsonPatchProperty { get; private set; }
 
         public ObjectTreeAnalysisResult(object objectToSearch, string propertyPath
             , IContractResolver contractResolver)
-        {
-            PropertyPath = propertyPath;
-            OriginalObject = objectToSearch;
-            ContractResolver = contractResolver;
+        {               
+            // construct the analysis result.
 
-            AnalyzeTree();
-        }
-
-        private void AnalyzeTree()
-        {
             // split the propertypath, and if necessary, remove the first 
             // empty item (that's the case when it starts with a "/")
 
-            var propertyPathTree = PropertyPath.Split('/').ToList();
-
-            object targetObject = OriginalObject;
+            var propertyPathTree = propertyPath.Split('/').ToList();
+            object targetObject = objectToSearch;
 
             if (string.IsNullOrWhiteSpace(propertyPathTree[0]))
             {
@@ -113,13 +95,12 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                         else
                         { 
                             break; 
-                        }
-
+                        } 
                     }
                     else
                     {
 
-                        var jsonContract = (JsonObjectContract)ContractResolver
+                        var jsonContract = (JsonObjectContract)contractResolver
                             .ResolveContract(targetObject.GetType());
 
                         // does the property exist?
@@ -141,42 +122,17 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                             // property cannot be found, and we're not working with dynamics.  
                             // Stop, and return invalid path.
                             break;
-                        }
- 
-                         
-                       // // find the value through reflection
-                       // var propertyInfoToGet = GetPropertyInfo(targetObject, propertyPathTree[i]
-                       //, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-                       // if (propertyInfoToGet == null)
-                       // {
-                       //     // property cannot be found, and we're not working with dynamics.  
-                       //     // Stop, and return invalid path.
-                       //     break;
-                       // }
-                       // else
-                       // {
-                       //     // unless we're at the last item, we should continue searching.
-                       //     // If we're at the last item, we need to stop
-                       //     if (!(i == propertyPathTree.Count - 1))
-                       //     {
-                       //         targetObject = propertyInfoToGet.GetValue(targetObject, null);
-                       //     }
-                       // }
+                        } 
                     }
                 } 
-            }
-
-
+            } 
 
             // two things can happen now.  The targetproperty can be an IDictionary - in that
             // case, it's valid for add if there's 1 item left in the propertyPathTree.
             //
             // it can also be a property info.  In that case, if there's nothing left in the path
             // tree we're at the end, if there's one left we can try and set that.  
-            //
-
-
+ 
             if (targetObject is IDictionary<string, object>)
             {
                 var leftOverPath = propertyPathTree
@@ -209,7 +165,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                 if (leftOverPath.Count == 1)
                 { 
-                    var jsonContract = (JsonObjectContract)ContractResolver
+                    var jsonContract = (JsonObjectContract)contractResolver
                         .ResolveContract(targetObject.GetType());
 
                     var attemptedProperty = jsonContract.Properties.FirstOrDefault
@@ -225,36 +181,9 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     {
                         IsValidPathForAdd = true;
                         IsValidPathForRemove = true;
-
                         JsonPatchProperty = new Helpers.JsonPatchProperty(attemptedProperty, targetObject);
-
-                    //    PropertyInfo = targetObject.GetType().GetProperty(leftOverPath.Last(),
-                    //BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance); ;
-                        PropertyPathInParent = leftOverPath.Last();
-                        ParentObject = targetObject;
-                    }
-                    //}
-
-               
-                    //// Get the property
-                    //var propertyToFind = targetObject.GetType().GetProperty(leftOverPath.Last(),
-                    //BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    
-                
-                    //if (propertyToFind == null)
-                    //{
-                    //    IsValidPathForAdd = false;
-                    //    IsValidPathForRemove = false;
-                    //}
-                    //else
-                    //{
-                    //    IsValidPathForAdd = true;
-                    //    IsValidPathForRemove = true;
-                    //    PropertyInfo = propertyToFind;
-                    //    PropertyPathInParent = leftOverPath.Last();
-                    //    ParentObject = targetObject;
-
-                    //}
+                        PropertyPathInParent = leftOverPath.Last(); 
+                    } 
                 }
                 else
                 {
@@ -285,14 +214,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             }
             else { return null; }
         }
-
-
-
-
-        private static PropertyInfo GetPropertyInfo(object targetObject, string propertyName,
-        BindingFlags bindingFlags)
-        {
-            return targetObject.GetType().GetProperty(propertyName, bindingFlags);
-        }
+         
     }
 }
