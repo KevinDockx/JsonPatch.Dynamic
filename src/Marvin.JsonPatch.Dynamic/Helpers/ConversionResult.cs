@@ -3,7 +3,6 @@
 //
 // Enjoy :-)
 
-
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal class ConversionResult
@@ -11,12 +10,10 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         public bool CanBeConverted { get; private set; }
         public object ConvertedInstance { get; private set; }
 
-
         public ConversionResult(bool canBeConverted, object convertedInstance)
         {
             CanBeConverted = canBeConverted;
             ConvertedInstance = convertedInstance;
-
         }
     }
 }

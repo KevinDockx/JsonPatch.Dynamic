@@ -8,7 +8,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -146,8 +145,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 {
                     IsValidPathForAdd = false; 
                     IsValidPathForRemove = false;
-                }
-                 
+                }                 
             }
             else
             {
@@ -183,8 +181,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     IsValidPathForAdd = false;
                     IsValidPathForRemove = false;
                 }
-            }
-             
+            }             
         }
 
         private object GetElementAtFromObject(object targetObject, int numericValue)
@@ -206,7 +203,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 else { return null; ; }
             }
             else { return null; }
-        }
-         
+        }         
     }
 }

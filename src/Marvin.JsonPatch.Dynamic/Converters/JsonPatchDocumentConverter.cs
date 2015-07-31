@@ -9,13 +9,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Marvin.JsonPatch.Dynamic.Converters
 {
-
     public class JsonPatchDocumentConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
@@ -25,7 +21,6 @@ namespace Marvin.JsonPatch.Dynamic.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-
             try
             {
                 if (reader.TokenType == JsonToken.Null)
@@ -52,13 +47,11 @@ namespace Marvin.JsonPatch.Dynamic.Converters
                 var container = Activator.CreateInstance(objectType, targetOperations);
 
                 return container;
-
             }
             catch (Exception ex)
             {
                 throw new JsonPatchException("The JsonPatchDocument was malformed and could not be parsed.", ex, 400);
             }
-
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

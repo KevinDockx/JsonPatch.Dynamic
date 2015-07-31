@@ -1,7 +1,5 @@
-﻿// Kevin Dockx
-//
-// Any comments, input: @KevinDockx
-// Any issues, requests: https://github.com/KevinDockx/JsonPatch
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
 //
 // Enjoy :-)
 
@@ -28,8 +26,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             {
                 return new ConversionResult(false, null);
             }
-        } 
- 
+        }  
 
         internal static ActualPropertyPathResult GetActualPropertyPath(string propertyPath, object objectToApplyTo, 
             Operation operationToReport, bool forPath)
@@ -40,7 +37,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             }
             else
             {
-
                 var possibleIndex = propertyPath.Substring(propertyPath.LastIndexOf("/") + 1);
                 int castedIndex = -1;
                 if (int.TryParse(possibleIndex, out castedIndex))
@@ -68,7 +64,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                               objectToApplyTo, 422);
                     } 
                 }
-
                 return new ActualPropertyPathResult(-1, propertyPath, false);
             }
         } 
@@ -101,7 +96,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                     return interfaceType.GetGenericArguments()[0];
                 }
             }
-
             return null;
         }
 
@@ -115,7 +109,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             {
                 return true;
             }
-
             return false;
         }
     }

@@ -7,32 +7,27 @@ using Marvin.JsonPatch.Dynamic.Adapters;
 using Marvin.JsonPatch.Dynamic.Converters;
 using Marvin.JsonPatch.Dynamic.Helpers;
 using Marvin.JsonPatch.Dynamic.Operations;
-using Marvin.JsonPatch.Exceptions;
 using Marvin.JsonPatch.Operations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Marvin.JsonPatch.Dynamic
-{
-    
+{    
     [JsonConverter(typeof(JsonPatchDocumentConverter))]
     public class JsonPatchDocument : IJsonPatchDocument
     {
-
         public List<Operation> Operations { get; private set; }
 
         [JsonIgnore]
         public IContractResolver ContractResolver { get; set; }
-
 
         public JsonPatchDocument()
         {
             Operations = new List<Operation>();
             ContractResolver = new DefaultContractResolver();
         }
-
-
+        
         // Create from list of operations  
         public JsonPatchDocument(List<Operation> operations)
         {
@@ -68,15 +63,12 @@ namespace Marvin.JsonPatch.Dynamic
         {
             Operations.Add(new Operation("copy", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
             return this;
-        }
-
-
+        } 
 
         public void ApplyTo<T>(T objectToApplyTo)
         {
             ApplyTo(objectToApplyTo, new DynamicObjectAdapter());
-        }
-
+        } 
 
         /// <summary>
         /// Apply the patch document, passing in a custom IObjectAdapter<typeparamref name=">"/>. 
@@ -91,9 +83,7 @@ namespace Marvin.JsonPatch.Dynamic
             {
                 op.Apply(objectToApplyTo, adapter);
             }
-
-        }
-
+        } 
 
         // return a copy - original operations should not
         // be editable through this.
@@ -115,7 +105,6 @@ namespace Marvin.JsonPatch.Dynamic
                     allOps.Add(untypedOp);
                 }
             }
-
             return allOps;
         }
     }

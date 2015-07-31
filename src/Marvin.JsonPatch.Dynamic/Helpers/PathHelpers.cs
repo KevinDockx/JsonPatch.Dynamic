@@ -4,6 +4,7 @@
 // Enjoy :-)
 
 using Marvin.JsonPatch.Exceptions;
+
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal static class PathHelpers

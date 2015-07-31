@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+using Newtonsoft.Json.Serialization;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -29,8 +28,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         /// <summary>
         /// Gets or sets Parent.
         /// </summary>
-        public object Parent { get; set; }
-
- 
+        public object Parent { get; set; } 
     }
 }
