@@ -39,9 +39,8 @@ namespace Marvin.JsonPatch.Dynamic.Operations
                 case OperationType.Copy:
                     adapter.Copy(operation, objectToApplyTo);
                     break;
-                //case OperationType.Test:
-                //    adapter.Test(this, objectToApplyTo);
-                //    break;
+                case OperationType.Test:
+                    throw new NotImplementedException("Test is currently not implemented.");  
                 default:
                     break;
             }

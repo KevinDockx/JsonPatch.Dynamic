@@ -213,7 +213,6 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                objectToApplyTo, 422);
                                 }
                             }
-
                         }
                         else
                         {
@@ -223,7 +222,6 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                path),
                                objectToApplyTo, 422);
                         }
-
                     }
                     else
                     {
@@ -256,7 +254,6 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                      path),
                      objectToApplyTo, 422);
                         }
-
                     }
                     else
                     {
@@ -573,19 +570,14 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         {
             // get value from "objectToGetValueFrom" at location "location"
             object valueAtLocation = null;
-          //  var positionAsInteger = -1;
-        //    var actualFromProperty = location;
-
-
 
             var pathResult = PropertyHelpers.GetActualPropertyPath(
            location,
            objectToGetValueFrom,
            operationToReport, false);
-         
-            var  positionAsInteger = pathResult.NumericEnd;
-            var  actualFromProperty = pathResult.PathToProperty;
-             
+
+            var positionAsInteger = pathResult.NumericEnd;
+            var actualFromProperty = pathResult.PathToProperty; 
 
             // first, analyze the tree. 
             var result = new ObjectTreeAnalysisResult(objectToGetValueFrom, actualFromProperty, ContractResolver);

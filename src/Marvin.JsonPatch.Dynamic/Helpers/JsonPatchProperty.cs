@@ -30,5 +30,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
         /// Gets or sets Parent.
         /// </summary>
         public object Parent { get; set; }
+
+ 
     }
 }

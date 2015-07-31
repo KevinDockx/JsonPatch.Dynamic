@@ -42,90 +42,31 @@ namespace Marvin.JsonPatch.Dynamic
 
         public JsonPatchDocument Add(string path, object value)
         {
-            var checkPathResult = PathHelpers.CheckPath(path);
-            if (!checkPathResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          path));
-            }
- 
-            Operations.Add(new Operation("add", checkPathResult.AdjustedPath, null, value));
+            Operations.Add(new Operation("add", PathHelpers.NormalizePath(path), null, value));
             return this;
         }
           
         public JsonPatchDocument Remove(string path)
         {
-            var checkPathResult = PathHelpers.CheckPath(path);
-            if (!checkPathResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          path));
-            }
- 
-            Operations.Add(new Operation("remove", checkPathResult.AdjustedPath, null, null));
+            Operations.Add(new Operation("remove", PathHelpers.NormalizePath(path), null, null));
             return this;
         }
 
         public JsonPatchDocument Replace(string path, object value)
         {
-            var checkPathResult = PathHelpers.CheckPath(path);
-            if (!checkPathResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          path));
-            }
- 
-            Operations.Add(new Operation("replace", checkPathResult.AdjustedPath, null, value));
+            Operations.Add(new Operation("replace", PathHelpers.NormalizePath(path), null, value));
             return this;
         }
    
         public JsonPatchDocument Move(string from, string path)
         {
-            var checkPathResult = PathHelpers.CheckPath(path);
-            var checkFromResult = PathHelpers.CheckPath(from);
-
-            if (!checkPathResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          path));
-            }
-
-            if (!checkFromResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          from));
-            }
-
-
-            Operations.Add(new Operation("move", checkPathResult.AdjustedPath, checkFromResult.AdjustedPath));
+            Operations.Add(new Operation("move", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
             return this;
         }
                  
         public JsonPatchDocument Copy(string from, string path)
         {
-            var checkPathResult = PathHelpers.CheckPath(path);
-            var checkFromResult = PathHelpers.CheckPath(from);
-
-            if (!checkPathResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          path));
-            }
-
-            if (!checkFromResult.IsCorrectlyFormedPath)
-            {
-                throw new JsonPatchException(
-                   string.Format("Provided string is not a valid path: {0}",
-                          from));
-            }
-
-            Operations.Add(new Operation("copy", checkPathResult.AdjustedPath, checkFromResult.AdjustedPath));
+            Operations.Add(new Operation("copy", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
             return this;
         }
 

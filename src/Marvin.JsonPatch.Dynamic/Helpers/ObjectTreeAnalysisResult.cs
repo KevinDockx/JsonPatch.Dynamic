@@ -50,8 +50,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                 lastPosition = i;
                 if (targetObject is IDictionary<string, object>)
-                {
-                    
+                { 
                     // find the value in the dictionary                   
                     if ((targetObject as IDictionary<string, object>)
                         .ContainsCaseInsensitiveKey(propertyPathTree[i]))

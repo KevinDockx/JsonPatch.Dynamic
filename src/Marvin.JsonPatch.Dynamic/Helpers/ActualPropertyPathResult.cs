@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 { 
-
     internal class ActualPropertyPathResult
     { 
         public int NumericEnd { get; private set; }

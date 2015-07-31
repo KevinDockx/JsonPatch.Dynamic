@@ -3,31 +3,30 @@
 //
 // Enjoy :-)
 
+using Marvin.JsonPatch.Exceptions;
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal static class PathHelpers
     {
-        internal static CheckPathResult CheckPath(string pathToCheck)
+        internal static string NormalizePath(string path)
         {
-           string adjustedPath = pathToCheck;
-
             // check for most common path errors on create.  This is not
             // absolutely necessary, but it allows us to already catch mistakes
             // on creation of the patch document rather than on execute.
 
-           if (pathToCheck.Contains(".") || pathToCheck.Contains("//")
-               || pathToCheck.Contains(" ") || pathToCheck.Contains("\\")
-             )
-           {
-               return new CheckPathResult(false, adjustedPath);
-           }
+            if (path.Contains(".") || path.Contains("//") || path.Contains(" ") || path.Contains("\\"))
+            {
+                throw new JsonPatchException(string.Format("Provided string is not a valid path: {0}", path), null, -1);
+            }
 
-           if (!(pathToCheck.StartsWith("/")))
-           {
-               adjustedPath = "/" + adjustedPath;
-           }
-
-           return new CheckPathResult(true, adjustedPath);
+            if (!(path.StartsWith("/")))
+            {
+                return "/" + path;
+            }
+            else
+            {
+                return path;
+            }
         }
     }
 }

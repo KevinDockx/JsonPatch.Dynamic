@@ -19,8 +19,7 @@ namespace Marvin.JsonPatch.Dynamic.Converters
     public class JsonPatchDocumentConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
-        {
-
+        { 
             return true;
         }
 

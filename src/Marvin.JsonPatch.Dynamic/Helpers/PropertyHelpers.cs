@@ -29,18 +29,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 return new ConversionResult(false, null);
             }
         } 
-
-        //internal static CheckNumericEndResult GetNumericEnd(string path)
-        //{
-        //    var possibleIndex = path.Substring(path.LastIndexOf("/") + 1);
-        //    int castedIndex = -1;
-        //    if (int.TryParse(possibleIndex, out castedIndex))
-        //    {
-        //        return new CheckNumericEndResult(true, castedIndex);
-        //    }
-
-        //    return new CheckNumericEndResult(false, null);
-        //}
+ 
 
         internal static ActualPropertyPathResult GetActualPropertyPath(string propertyPath, object objectToApplyTo, 
             Operation operationToReport, bool forPath)
@@ -82,10 +71,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
                 return new ActualPropertyPathResult(-1, propertyPath, false);
             }
-        }
-
-        
-
+        } 
 
         internal static bool IsNonStringArray(Type type)
         {
