@@ -21,6 +21,11 @@ namespace Marvin.JsonPatch.Dynamic.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            if (objectType != typeof(JsonPatchDocument))
+            {
+                throw new ArgumentException("ObjectType must be of type JsonPatchDocument", "objectType");
+            }
+
             try
             {
                 if (reader.TokenType == JsonToken.Null)
@@ -50,7 +55,7 @@ namespace Marvin.JsonPatch.Dynamic.Converters
             }
             catch (Exception ex)
             {
-                throw new JsonPatchException("The JsonPatchDocument was malformed and could not be parsed.", ex, 400);
+                throw new JsonPatchException("The JsonPatchDocument was malformed and could not be parsed.", ex);
             }
         }
 

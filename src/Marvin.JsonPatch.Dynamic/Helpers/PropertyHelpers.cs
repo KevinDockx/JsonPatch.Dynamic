@@ -59,9 +59,12 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                               propertyPath);
 
                         // negative position - invalid path
-                        throw new JsonPatchException(operationToReport,
-                              message,
-                              objectToApplyTo, 422);
+                        throw new JsonPatchException(
+                                new JsonPatchError(
+                                    objectToApplyTo,
+                                    operationToReport,
+                                    message), 
+                                422);
                     } 
                 }
                 return new ActualPropertyPathResult(-1, propertyPath, false);

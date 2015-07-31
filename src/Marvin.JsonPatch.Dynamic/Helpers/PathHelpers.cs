@@ -17,7 +17,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
             if (path.Contains(".") || path.Contains("//") || path.Contains(" ") || path.Contains("\\"))
             {
-                throw new JsonPatchException(string.Format("Provided string is not a valid path: {0}", path), null, -1);
+                throw new JsonPatchException(string.Format("Provided string is not a valid path: {0}", path), null);
             }
 
             if (!(path.StartsWith("/")))

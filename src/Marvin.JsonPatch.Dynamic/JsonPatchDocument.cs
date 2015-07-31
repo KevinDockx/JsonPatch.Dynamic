@@ -87,7 +87,7 @@ namespace Marvin.JsonPatch.Dynamic
 
         // return a copy - original operations should not
         // be editable through this.
-        public List<Operation> GetOperations()
+        IList<Operation> IJsonPatchDocument.GetOperations()
         {
             var allOps = new List<Operation>();
 
@@ -105,7 +105,8 @@ namespace Marvin.JsonPatch.Dynamic
                     allOps.Add(untypedOp);
                 }
             }
+
             return allOps;
-        }
+        } 
     }
 }
