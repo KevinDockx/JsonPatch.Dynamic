@@ -50,7 +50,7 @@
     <Compile Include="Adapters\IDynamicObjectAdapter.cs" />
     <Compile Include="Adapters\DynamicObjectAdapter.cs" />
     <Compile Include="Converters\JsonPatchDocumentConverter.cs" />
-    <Compile Include="Helpers\CheckNumericEndResult.cs" />
+    <Compile Include="Helpers\ActualPropertyPathResult.cs" />
     <Compile Include="Helpers\CheckPathResult.cs" />
     <Compile Include="Helpers\ConversionResult.cs" />
     <Compile Include="Helpers\ExpandoObjectDictionaryExtensions.cs" />

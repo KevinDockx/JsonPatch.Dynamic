@@ -29,19 +29,14 @@ namespace Marvin.JsonPatch.Dynamic.Converters
 
             try
             {
-
                 if (reader.TokenType == JsonToken.Null)
                     return null;
                 
                 // load jObject
                 JArray jObject = JArray.Load(reader);
 
-                // Create target object for Json => list of operations
-  
-                var concreteList = typeof(List<Operation>);
-
-                var targetOperations = Activator.CreateInstance(concreteList);
-
+                // Create target object for Json => list of operations  
+                var targetOperations = new List<Operation>(); 
 
                 // Create a new reader for this jObject, and set all properties 
                 // to match the original reader.
@@ -75,8 +70,7 @@ namespace Marvin.JsonPatch.Dynamic.Converters
                 var lst = jsonPatchDoc.GetOperations();
 
                 // write out the operations, no envelope
-                serializer.Serialize(writer, lst);
-
+                serializer.Serialize(writer, lst); 
             }
         }
     }

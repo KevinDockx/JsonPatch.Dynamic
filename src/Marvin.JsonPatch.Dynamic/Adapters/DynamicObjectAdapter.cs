@@ -38,39 +38,16 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             // that value represents the position; if the path ends in "-", we're appending
             // to the list.
 
-            var appendList = false;
-            var positionAsInteger = -1;
-            var actualPathToProperty = path;
+            // get path result
+            var pathResult = PropertyHelpers.GetActualPropertyPath(
+            path,
+            objectToApplyTo,
+            operationToReport, true);
 
-            if (path.EndsWith("/-"))
-            {
-                appendList = true;
-                actualPathToProperty = path.Substring(0, path.Length - 2);
-            }
-            else
-            {
-                var checkNumericEndResult = PropertyHelpers.GetNumericEnd(path);
-
-                if (checkNumericEndResult.HasNumericEnd)
-                {
-                    positionAsInteger = checkNumericEndResult.NumericEnd;
-                    if (positionAsInteger > -1)
-                    {
-                        actualPathToProperty = path.Substring(0,
-                       path.LastIndexOf('/' + positionAsInteger.ToString()));
-                    }
-                    else
-                    {
-                        // negative position - invalid path
-                        throw new JsonPatchException(operationToReport,
-                              string.Format("Patch failed: provided path is invalid, position too small: {0}",
-                              path),
-                              objectToApplyTo, 422);
-                    }
-                }
-            }
-
-
+            var appendList = pathResult.ExecuteAtEnd;
+            var positionAsInteger = pathResult.NumericEnd;
+            var actualPathToProperty = pathResult.PathToProperty;
+             
             var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty, ContractResolver);
 
             if (result.UseDynamicLogic)
@@ -118,24 +95,20 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 }
                                 else
                                 {
-                                    // specified index must not be greater than the amount of items in the
-                                    // array
-                                    if (positionAsInteger <= array.Count)
-                                    {
-                                        array.Insert(positionAsInteger, conversionResult.ConvertedInstance);
-                                        result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
-                                    }
-                                    else
+                                    // specified index must not be greater than 
+                                    // the amount of items in the array
+                                    if (positionAsInteger > array.Count)
                                     {
                                         throw new JsonPatchException(operationToReport,
-                                   string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
-                                   path),
-                                   objectToApplyTo, 422);
+                                            string.Format("Patch failed: provided path is invalid for array property type at location path: {0}: position larger than array size",
+                                            path),
+                                            objectToApplyTo, 422);
                                     }
+
+                                    array.Insert(positionAsInteger, conversionResult.ConvertedInstance);
+                                    result.Container.SetValueForCaseInsensitiveKey(
+                                        result.PropertyPathInParent, array);                                
                                 }
-
-
-
                             }
                             else
                             {
@@ -321,37 +294,44 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             // remove, in this implementation, CAN remove properties if the container is an
             // ExpandoObject.
 
-            var removeFromList = false;
-            var positionAsInteger = -1;
-            var actualPathToProperty = path;
+          
+            var pathResult = PropertyHelpers.GetActualPropertyPath(
+           path,
+           objectToApplyTo,
+           operationToReport, true);
 
-            if (path.EndsWith("/-"))
-            {
-                removeFromList = true;
-                actualPathToProperty = path.Substring(0, path.Length - 2);
-            }
-            else
-            {
-                var checkNumericEndResult = PropertyHelpers.GetNumericEnd(path);
+            var removeFromList = pathResult.ExecuteAtEnd;
+            var positionAsInteger = pathResult.NumericEnd;
+            var actualPathToProperty = pathResult.PathToProperty;
 
-                if (checkNumericEndResult.HasNumericEnd)
-                {
-                    positionAsInteger = checkNumericEndResult.NumericEnd;
-                    if (positionAsInteger > -1)
-                    {
-                        actualPathToProperty = path.Substring(0,
-                       path.LastIndexOf('/' + positionAsInteger.ToString()));
-                    }
-                    else
-                    {
-                        // negative position - invalid path
-                        throw new JsonPatchException(operationToReport,
-                              string.Format("Patch failed: provided path is invalid, position too small: {0}",
-                              path),
-                              objectToApplyTo, 422);
-                    }
-                }
-            }
+
+            //if (path.EndsWith("/-"))
+            //{
+            //    removeFromList = true;
+            //    actualPathToProperty = path.Substring(0, path.Length - 2);
+            //}
+            //else
+            //{
+            //    var checkNumericEndResult = PropertyHelpers.GetNumericEnd(path);
+
+            //    if (checkNumericEndResult.HasNumericEnd)
+            //    {
+            //        positionAsInteger = checkNumericEndResult.NumericEnd;
+            //        if (positionAsInteger > -1)
+            //        {
+            //            actualPathToProperty = path.Substring(0,
+            //           path.LastIndexOf('/' + positionAsInteger.ToString()));
+            //        }
+            //        else
+            //        {
+            //            // negative position - invalid path
+            //            throw new JsonPatchException(operationToReport,
+            //                  string.Format("Patch failed: provided path is invalid, position too small: {0}",
+            //                  path),
+            //                  objectToApplyTo, 422);
+            //        }
+            //    }
+            //}
 
 
             var result = new ObjectTreeAnalysisResult(objectToApplyTo, actualPathToProperty, ContractResolver);
@@ -593,29 +573,19 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         {
             // get value from "objectToGetValueFrom" at location "location"
             object valueAtLocation = null;
-            var positionAsInteger = -1;
-            var actualFromProperty = location;
+          //  var positionAsInteger = -1;
+        //    var actualFromProperty = location;
 
 
-            var checkNumericEndResult = PropertyHelpers.GetNumericEnd(location);
 
-            if (checkNumericEndResult.HasNumericEnd)
-            {
-                positionAsInteger = checkNumericEndResult.NumericEnd;
-                if (positionAsInteger > -1)
-                {
-                    actualFromProperty = location.Substring(0,
-                   location.LastIndexOf('/' + positionAsInteger.ToString()));
-                }
-                else
-                {
-                    // negative position - invalid path
-                    throw new JsonPatchException(operationToReport,
-                          string.Format("Patch failed: provided from is invalid, position too small: {0}",
-                          location),
-                          objectToGetValueFrom, 422);
-                }
-            }
+            var pathResult = PropertyHelpers.GetActualPropertyPath(
+           location,
+           objectToGetValueFrom,
+           operationToReport, false);
+         
+            var  positionAsInteger = pathResult.NumericEnd;
+            var  actualFromProperty = pathResult.PathToProperty;
+             
 
             // first, analyze the tree. 
             var result = new ObjectTreeAnalysisResult(objectToGetValueFrom, actualFromProperty, ContractResolver);

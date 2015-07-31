@@ -5,6 +5,8 @@
 //
 // Enjoy :-)
 
+using Marvin.JsonPatch.Exceptions;
+using Marvin.JsonPatch.Operations;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -28,17 +30,62 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
             }
         } 
 
-        internal static CheckNumericEndResult GetNumericEnd(string path)
-        {
-            var possibleIndex = path.Substring(path.LastIndexOf("/") + 1);
-            int castedIndex = -1;
-            if (int.TryParse(possibleIndex, out castedIndex))
-            {
-                return new CheckNumericEndResult(true, castedIndex);
-            }
+        //internal static CheckNumericEndResult GetNumericEnd(string path)
+        //{
+        //    var possibleIndex = path.Substring(path.LastIndexOf("/") + 1);
+        //    int castedIndex = -1;
+        //    if (int.TryParse(possibleIndex, out castedIndex))
+        //    {
+        //        return new CheckNumericEndResult(true, castedIndex);
+        //    }
 
-            return new CheckNumericEndResult(false, null);
+        //    return new CheckNumericEndResult(false, null);
+        //}
+
+        internal static ActualPropertyPathResult GetActualPropertyPath(string propertyPath, object objectToApplyTo, 
+            Operation operationToReport, bool forPath)
+        {
+            if (propertyPath.EndsWith("/-"))
+            {
+                return new ActualPropertyPathResult(-1, propertyPath.Substring(0, propertyPath.Length - 2), true);
+            }
+            else
+            {
+
+                var possibleIndex = propertyPath.Substring(propertyPath.LastIndexOf("/") + 1);
+                int castedIndex = -1;
+                if (int.TryParse(possibleIndex, out castedIndex))
+                {
+                    // has numeric end.  
+                    if (castedIndex > -1)
+                    {
+                        var pathToProperty = propertyPath.Substring(
+                           0,
+                           propertyPath.LastIndexOf('/' + castedIndex.ToString()));
+
+                        return new ActualPropertyPathResult(castedIndex, pathToProperty, false);
+                    }
+                    else
+                    {
+                        string message = forPath ? 
+                             string.Format("Patch failed: provided path is invalid, position too small: {0}",
+                              propertyPath)
+                              : string.Format("Patch failed: provided from is invalid, position too small: {0}",
+                              propertyPath);
+
+                        // negative position - invalid path
+                        throw new JsonPatchException(operationToReport,
+                              message,
+                              objectToApplyTo, 422);
+                    } 
+                }
+
+                return new ActualPropertyPathResult(-1, propertyPath, false);
+            }
         }
+
+        
+
 
         internal static bool IsNonStringArray(Type type)
         {

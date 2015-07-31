@@ -11,7 +11,7 @@ namespace Marvin.JsonPatch.Dynamic.Operations
 {
     public static class OperationExtensions
     {
-        internal static void Apply(this Operation operation, dynamic objectToApplyTo, IDynamicObjectAdapter adapter)
+        internal static void Apply(this Operation operation, object objectToApplyTo, IDynamicObjectAdapter adapter)
         {
             if (objectToApplyTo == null)
             {
