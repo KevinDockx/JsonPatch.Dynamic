@@ -286,12 +286,12 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
         }
 
-        public void Add(JsonPatch.Operations.Operation operation, dynamic objectToApplyTo)
+        public void Add(JsonPatch.Operations.Operation operation, object objectToApplyTo)
         {
             Add(operation.path, operation.value, objectToApplyTo, operation);
         }
 
-        public void Remove(Operation operation, dynamic objectToApplyTo)
+        public void Remove(Operation operation, object objectToApplyTo)
         {
             Remove(operation.path, objectToApplyTo, operation);
         }
@@ -516,7 +516,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
         }
 
-        public void Replace(Operation operation, dynamic objectToApplyTo)
+        public void Replace(Operation operation, object objectToApplyTo)
         {
             var typeOfRemovedProperty = Remove(operation.path, objectToApplyTo, operation);
 
@@ -535,7 +535,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             Add(operation.path, conversionResult.ConvertedInstance, objectToApplyTo, operation);           
         }
 
-        public void Move(Operation operation, dynamic objectToApplyTo)
+        public void Move(Operation operation, object objectToApplyTo)
         {
             var valueAtFromLocation = GetValueAtLocation(operation.from, objectToApplyTo, operation);
 
@@ -546,14 +546,14 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             Add(operation.path, valueAtFromLocation, objectToApplyTo, operation);
         }
 
-        public void Copy(Operation operation, dynamic objectToApplyTo)
+        public void Copy(Operation operation, object objectToApplyTo)
         {
             // get value at from location and add that value to the path location
             Add(operation.path, GetValueAtLocation(operation.from, objectToApplyTo, operation)
                 , objectToApplyTo, operation);
         }
 
-        private object GetValueAtLocation(string location, dynamic objectToGetValueFrom, Operation operationToReport)
+        private object GetValueAtLocation(string location, object objectToGetValueFrom, Operation operationToReport)
         {
             // get value from "objectToGetValueFrom" at location "location"
             object valueAtLocation = null;
@@ -694,7 +694,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             return valueAtLocation;
         }
 
-        public void Test(Operation operation, dynamic objectToApplyTo)
+        public void Test(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException("Test is currently not implemented");
         }
