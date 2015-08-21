@@ -299,10 +299,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
         /// <summary>
         /// Remove is used by various operations (eg: remove, move, ...), yet through different operations;
         /// This method allows code reuse yet reporting the correct operation on error.  The return value
-        /// contains the type of the item that has been removed - this can be used by other methods, like 
-        /// replace, to ensure that we can pass in the correctly typed value to whatever method follows.
+        /// contains the type of the item that has been removed (and a bool possibly signifying an error)
+        /// This can be used by other methods, like replace, to ensure that we can pass in the correctly 
+        /// typed value to whatever method follows.
         /// </summary>
-        private Type Remove(string path, object objectToApplyTo, Operation operationToReport)
+        private RemovedPropertyTypeResult Remove(string path, object objectToApplyTo, Operation operationToReport)
         {
             // remove, in this implementation, CAN remove properties if the container is an
             // ExpandoObject.
@@ -326,15 +327,30 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     // the dictionary.  If it's an array, we need to check the position first.
                     if (removeFromList || positionAsInteger > -1)
                     {
-                        var typeOfPathProperty = result.Container
-                                .GetValueForCaseInsensitiveKey(result.PropertyPathInParent).GetType();
+                        var valueOfPathProperty =  result.Container
+                                .GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
+
+                        // we cannot continue when the value is null, because to be able to
+                        // continue we need to be able to check if the array is a non-string array
+                        if (valueOfPathProperty == null)
+                        {                      
+                            throw new JsonPatchException(
+                               new JsonPatchError(
+                                 objectToApplyTo,
+                                 operationToReport,
+                                 string.Format("Patch failed: cannot determine array property type at location path: {0}.", path)),
+                               422); 
+                        }
+                        
+                        var typeOfPathProperty = valueOfPathProperty.GetType();
+                        
 
                         if (PropertyHelpers.IsNonStringArray(typeOfPathProperty))
                         {
                             // now, get the generic type of the enumerable
                             var genericTypeOfArray = PropertyHelpers.GetIListType(typeOfPathProperty);
 
-                            var array = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent) as IList;
+                            var array = (IList)result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
 
                             if (removeFromList)
                             {
@@ -353,7 +369,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
 
                                 // return the type of the value that has been removed.
-                                return genericTypeOfArray;
+                                return new RemovedPropertyTypeResult(genericTypeOfArray, false);
                             }
                             else
                             {
@@ -371,7 +387,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 result.Container.SetValueForCaseInsensitiveKey(result.PropertyPathInParent, array);
 
                                 // return the type of the value that has been removed.
-                                return genericTypeOfArray;                             
+                                return new RemovedPropertyTypeResult(genericTypeOfArray, false);               
                             }
                         }
                         else
@@ -388,11 +404,20 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     {
                         // get the property
                         var getResult = result.Container.GetValueForCaseInsensitiveKey(result.PropertyPathInParent);
-                        var actualType = getResult.GetType();
-
+                                          
                         // remove the property
                         result.Container.RemoveValueForCaseInsensitiveKey(result.PropertyPathInParent);
-                        return actualType;
+
+                        // value is not null, we can determine the type
+                        if (getResult != null)
+                        {
+                            var actualType = getResult.GetType();
+                            return new RemovedPropertyTypeResult(actualType, false);
+                        }
+                        else
+                        {
+                            return new RemovedPropertyTypeResult(null, false);
+                        }                        
                     }
                 }
                 else
@@ -448,7 +473,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 array.RemoveAt(array.Count - 1);
 
                                 // return the type of the value that has been removed
-                                return genericTypeOfArray;
+                                return new RemovedPropertyTypeResult(genericTypeOfArray, false);                            
                             }
                             else
                             {
@@ -465,7 +490,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                 array.RemoveAt(positionAsInteger);
 
                                 // return the type of the value that has been removed
-                                return genericTypeOfArray;                                 
+                                return new RemovedPropertyTypeResult(genericTypeOfArray, false);                                  
                             }
                         }
                         else
@@ -511,16 +536,32 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                     }
 
                     patchProperty.Property.ValueProvider.SetValue(patchProperty.Parent, value);
-                    return patchProperty.Property.PropertyType;
+                    return new RemovedPropertyTypeResult(patchProperty.Property.PropertyType, false);                        
                 }
             }
         }
 
         public void Replace(Operation operation, object objectToApplyTo)
         {
-            var typeOfRemovedProperty = Remove(operation.path, objectToApplyTo, operation);
+            var removeResult = Remove(operation.path, objectToApplyTo, operation);
 
-            var conversionResult = PropertyHelpers.ConvertToActualType(typeOfRemovedProperty, operation.value);
+            if (removeResult.HasError)
+            {
+                // return => currently not applicable, will throw exception in Remove method
+            }
+            else if (!removeResult.HasError && removeResult.ActualType == null)
+            {
+                // the remove operation completed succesfully, but we could not determine the type.  
+                throw new JsonPatchException(
+                   new JsonPatchError(
+                     objectToApplyTo,
+                     operation,
+                     string.Format("Patch failed: could not determine type of property at location {0}", operation.path)),
+                   422); 
+            }
+
+
+            var conversionResult = PropertyHelpers.ConvertToActualType(removeResult.ActualType, operation.value);
 
             if (!conversionResult.CanBeConverted)
             {
@@ -531,7 +572,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                      string.Format("Patch failed: property value cannot be converted to type of path location {0}", operation.path)),
                    422); 
             }
-             
+                       
             Add(operation.path, conversionResult.ConvertedInstance, objectToApplyTo, operation);           
         }
 

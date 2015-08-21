@@ -60,7 +60,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
         }
 
-
+        
 
         [Fact]
         public void AddNewPropertyToNestedAnonymousObjectShouldFail()
