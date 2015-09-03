@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,9 +18,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class ReplaceOperationTests
     {
-
-       
-
         [Fact]
         public void ReplaceGuidTest()
         {
@@ -29,81 +31,60 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("GuidValue", newGuid);
 
-
             // serialize & deserialize 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserizalized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserizalized.ApplyTo(doc);
 
             Assert.Equal(newGuid, doc.GuidValue);
-
-
         }
-
 
         [Fact]
         public void ReplaceGuidTestExpandoObject()
         {
             dynamic doc = new ExpandoObject();
-            doc.GuidValue = Guid.NewGuid();
-        
+            doc.GuidValue = Guid.NewGuid();        
 
             var newGuid = Guid.NewGuid();
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("GuidValue", newGuid);
-
-
+            
             // serialize & deserialize 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserizalized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
 
             deserizalized.ApplyTo(doc);
 
             Assert.Equal(newGuid, doc.GuidValue);
-
-
         }
-
-
 
         [Fact]
         public void ReplaceGuidTestExpandoObjectInAnonymous()
         {
-              dynamic internalObject = new ExpandoObject();
-            internalObject.GuidValue = Guid.NewGuid();
+            dynamic nestedObject = new ExpandoObject();
+            nestedObject.GuidValue = Guid.NewGuid();
 
             dynamic doc = new
             {
-                InternalObject = internalObject
-            };
-          
+                NestedObject = nestedObject
+            };          
 
             var newGuid = Guid.NewGuid();
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
-            patchDoc.Replace("internalobject/GuidValue", newGuid);
-
+            patchDoc.Replace("nestedobject/GuidValue", newGuid);
 
             // serialize & deserialize 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserizalized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserizalized.ApplyTo(doc);
 
-            Assert.Equal(newGuid, doc.InternalObject.GuidValue);
-
-
+            Assert.Equal(newGuid, doc.NestedObject.GuidValue);
         }
-
-
-
-
-
+        
         [Fact]
         public void ReplaceNestedObjectTest()
         {
@@ -114,7 +95,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                     IntegerList = new List<int>() { 1, 2, 3 }
                 };
 
-
             var newDTO = new SimpleDTO()
             {
                 DoubleValue = 1
@@ -123,7 +103,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("SimpleDTO", newDTO);
-
 
             // serialize & deserialize 
             var serialized = JsonConvert.SerializeObject(patchDoc);
@@ -134,12 +113,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(1, doc.SimpleDTO.DoubleValue);
             Assert.Equal(0, doc.SimpleDTO.IntegerValue);
             Assert.Equal(null, doc.SimpleDTO.IntegerList);
-
-
         }
-
-
-
 
         [Fact]
         public void ReplaceInList()
@@ -157,10 +131,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 5, 2, 3 }, doc.IntegerList);
-
         }
-
-
 
         [Fact]
         public void ReplaceFullList()
@@ -178,9 +149,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
             
             Assert.Equal(new List<int>() { 4, 5, 6 }, doc.IntegerList);
-
         }
-
 
         [Fact]
         public void ReplaceInListInList()
@@ -191,7 +160,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                     IntegerList = new List<int>(){1,2,3}
                 }};
            
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("SimpleDTOList/0/IntegerList/0", 4);
@@ -204,8 +172,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(4, doc.SimpleDTOList[0].IntegerList[0]);
         }
 
-
-
         [Fact]
         public void ReplaceInListInListAtEnd()
         {
@@ -214,8 +180,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 new SimpleDTO() {
                     IntegerList = new List<int>(){1,2,3}
                 }};
-
-
+            
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("SimpleDTOList/0/IntegerList/-", 4);
@@ -228,8 +193,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(4, doc.SimpleDTOList[0].IntegerList[2]);
         }
 
-
-
+        [Fact]
         public void ReplaceInListInListInvalidPositionTooLarge()
         {
             dynamic doc = new ExpandoObject();
@@ -245,12 +209,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-
         }
 
+        [Fact]
         public void ReplaceInListInListInvalidPositionTooSmall()
         {
             dynamic doc = new ExpandoObject();
@@ -266,19 +228,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-
         }
-
 
         [Fact]
         public void ReplaceFullListFromEnumerable()
         {
             dynamic doc = new ExpandoObject();
             doc.IntegerList = new List<int>() { 1, 2, 3 };
-
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -289,7 +246,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             deserialized.ApplyTo(doc);
             Assert.Equal(new List<int>() { 4, 5, 6 }, doc.IntegerList);
-
         }
 
         [Fact]
@@ -308,12 +264,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 4, 5, 6 }, doc.IntegerList);
-
-
         }
-
-
-
 
         [Fact]
         public void ReplaceAtEndOfList()
@@ -321,18 +272,16 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.IntegerList = new List<int>() { 1, 2, 3 };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("IntegerList/-", 5);
+
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
             deserialized.ApplyTo(doc);
             
             Assert.Equal(new List<int>() { 1, 2, 5 }, doc.IntegerList);
-
         }
-
 
         [Fact]
         public void ReplaceInListInvalidInvalidPositionTooLarge()
@@ -340,10 +289,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.IntegerList = new List<int>() { 1, 2, 3 };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("IntegerList/3", 5);
+
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
@@ -351,20 +300,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             {
                 deserialized.ApplyTo(doc);
             });
-
-
         }
-
-
 
         [Fact]
         public void ReplaceInListInvalidPositionTooSmall()
         {
-
             dynamic doc = new ExpandoObject();
             doc.IntegerList = new List<int>() { 1, 2, 3 };
-
-
+            
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Replace("IntegerList/-1", 5);
@@ -376,9 +319,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             {
                 deserialized.ApplyTo(doc);
             });
-
-
         }
-
     }
 }

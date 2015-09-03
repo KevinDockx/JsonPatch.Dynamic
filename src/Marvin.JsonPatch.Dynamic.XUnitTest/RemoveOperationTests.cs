@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,11 +18,9 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
     public class RemoveOperationTests
     {
 
-
         [Fact]
         public void RemovePropertyShouldFailIfRootIsAnonymous()
         {
-
             dynamic doc = new
             {
                 Test = 1
@@ -31,14 +34,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
 
         [Fact]
         public void RemovePropertyShouldFailIfItDoesntExist()
         {
-
             dynamic doc = new ExpandoObject();
             doc.Test = 1; 
 
@@ -50,15 +50,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
-
          
         [Fact]
         public void RemovePropertyFromExpandoObject()
         {
-
             dynamic obj = new ExpandoObject();
             obj.Test = 1; 
 
@@ -69,7 +65,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(obj);
 
             var cont = obj as IDictionary<string, object>;
@@ -79,15 +74,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             cont.TryGetValue("Test", out valueFromDictionary);
             
             Assert.Null(valueFromDictionary);
-
         }
-
-
 
         [Fact]
         public void RemovePropertyFromExpandoObjectMixedCase()
         {
-
             dynamic obj = new ExpandoObject();
             obj.Test = 1;
 
@@ -98,7 +89,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(obj);
 
             var cont = obj as IDictionary<string, object>;
@@ -108,16 +98,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             cont.TryGetValue("Test", out valueFromDictionary);
 
             Assert.Null(valueFromDictionary);
-
         }
-
-
-
 
         [Fact]
         public void RemoveNestedPropertyFromExpandoObject()
         {
-
             dynamic obj = new ExpandoObject();
             obj.Test = new ExpandoObject();
             obj.Test.AnotherTest = "A";
@@ -129,7 +114,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(obj);
 
             var cont = obj as IDictionary<string, object>;
@@ -139,17 +123,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             cont.TryGetValue("Test", out valueFromDictionary);
 
             Assert.Null(valueFromDictionary);
-
         }
-
-
-
-
 
         [Fact]
         public void RemoveNestedPropertyFromExpandoObjectMixedCase()
         {
-
             dynamic obj = new ExpandoObject();
             obj.Test = new ExpandoObject();
             obj.Test.AnotherTest = "A";
@@ -161,7 +139,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(obj);
 
             var cont = obj as IDictionary<string, object>;
@@ -171,9 +148,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             cont.TryGetValue("Test", out valueFromDictionary);
 
             Assert.Null(valueFromDictionary);
-
         }
-
 
         [Fact]
         public void NestedRemove()
@@ -182,8 +157,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             doc.SimpleDTO = new SimpleDTO()
                 {
                     StringProperty = "A"
-                };
-            
+                };            
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -192,11 +166,9 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(doc);
 
             Assert.Equal(null, doc.SimpleDTO.StringProperty);
-
         }
 
         [Fact]
@@ -208,7 +180,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 StringProperty = "A"
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Remove("Simpledto/stringProperty");
@@ -216,15 +187,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(doc);
 
             Assert.Equal(null, doc.SimpleDTO.StringProperty);
-
         }
-
-
-
 
         [Fact]
         public void NestedRemoveFromList()
@@ -233,9 +199,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             doc.SimpleDTO = new SimpleDTO()
                 {
                     IntegerList = new List<int>() { 1, 2, 3 }
-                };
-          
-
+                };    
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -249,8 +213,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
         }
 
-
-
         [Fact]
         public void NestedRemoveFromListMixedCase()
         {
@@ -259,8 +221,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             {
                 IntegerList = new List<int>() { 1, 2, 3 }
             };
-
-
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -274,8 +234,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
         }
 
-
-
         [Fact]
         public void NestedRemoveFromListInvalidPositionTooLarge()
         {
@@ -285,7 +243,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                     IntegerList = new List<int>() { 1, 2, 3 }
                 };
         
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Remove("SimpleDTO/IntegerList/3");
@@ -294,15 +251,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
-
 
         [Fact]
         public void NestedRemoveFromListInvalidPositionTooSmall()
         {
-
             dynamic doc = new ExpandoObject();
             doc.SimpleDTO = new SimpleDTO()
                 {
@@ -317,9 +270,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
 
         [Fact]
         public void NestedRemoveFromEndOfList()
@@ -340,10 +291,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
-
         }
-
-
-
     }
 }

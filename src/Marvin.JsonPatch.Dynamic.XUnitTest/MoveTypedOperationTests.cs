@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +14,7 @@ using Xunit;
 namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class MoveTypedOperationTests
-    {
-       
-
+    {       
         [Fact]
         public void Move()
         {
@@ -34,9 +37,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(null, doc.StringProperty);
         }
 
-         
-
-
         [Fact]
         public void MoveInList()
         {
@@ -57,9 +57,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 2, 1, 3 }, doc.IntegerList);
         }
 
-
-      
-
         [Fact]
         public void MoveFromListToEndOfList()
         {
@@ -78,9 +75,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 2, 3, 1 }, doc.IntegerList);
         }
-
-
-      
 
         [Fact]
         public void MoveFomListToNonList()
@@ -102,10 +96,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 2, 3 }, doc.IntegerList);
             Assert.Equal(1, doc.IntegerValue);
         }
-
-
-
-
 
         [Fact]
         public void MoveFromNonListToList()
@@ -129,10 +119,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 5, 1, 2, 3 }, doc.IntegerList);
         }
 
-
-     
-
-
         [Fact]
         public void MoveToEndOfList()
         {
@@ -153,8 +139,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(0, doc.IntegerValue);
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.IntegerList);
-
         } 
-
     }
 }

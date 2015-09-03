@@ -3,7 +3,6 @@
 //
 // Enjoy :-)
 
-
 using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;

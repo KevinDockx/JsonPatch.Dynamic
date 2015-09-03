@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,9 +16,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class RemoveTypedOperationTests
     {
-
-       
-
         [Fact]
         public void Remove()
         {
@@ -32,11 +34,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(null, doc.StringProperty);
-
         }
-
-         
-
 
         [Fact]
         public void RemoveFromList()
@@ -56,9 +54,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.IntegerList);
-        }
-
- 
+        } 
 
         [Fact]
         public void RemoveFromListInvalidPositionTooLarge()
@@ -75,14 +71,12 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });            
         }
  
         [Fact]
         public void RemoveFromListInvalidPositionTooSmall()
         {
-
             var doc = new SimpleDTO()
             {
                 IntegerList = new List<int>() { 1, 2, 3 }
@@ -96,10 +90,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-        }
-
- 
+        } 
 
         [Fact]
         public void RemoveFromEndOfList()
@@ -119,11 +110,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.IntegerList);
-
         }
-
- 
-
 
         [Fact]
         public void NestedRemove()
@@ -143,16 +130,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(doc);
 
             Assert.Equal(null, doc.SimpleDTO.StringProperty);
-
-        }
-
-
-
-        
+        }        
 
         [Fact]
         public void NestedRemoveFromList()
@@ -165,7 +146,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 }
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Remove("SimpleDTO/IntegerList/2");
@@ -176,9 +156,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
-        }
-
- 
+        }        
 
         [Fact]
         public void NestedRemoveFromListInvalidPositionTooLarge()
@@ -199,23 +177,18 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
-
  
         [Fact]
         public void NestedRemoveFromListInvalidPositionTooSmall()
         {
-
             var doc = new SimpleDTOWithNestedDTO()
             {
                 SimpleDTO = new SimpleDTO()
                 {
                     IntegerList = new List<int>() { 1, 2, 3 }
                 }
-            }
-              ;
+            };
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -225,9 +198,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
             
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-        }
-         
+        }         
 
         [Fact]
         public void NestedRemoveFromEndOfList()
@@ -250,9 +221,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
-
         }
-
-
     }
 }

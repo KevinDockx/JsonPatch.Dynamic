@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -10,8 +15,7 @@ using Xunit;
 namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class MoveOperationTests
-    {
-        
+    {        
         [Fact]
         public void Move()
         {
@@ -19,7 +23,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             doc.StringProperty = "A";
             doc.AnotherStringProperty = "B";
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Move("StringProperty", "AnotherStringProperty");
@@ -34,11 +37,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var cont = doc as IDictionary<string, object>;
             object valueFromDictionary;
             cont.TryGetValue("StringProperty", out valueFromDictionary);
-            Assert.Null(valueFromDictionary);
-             
+            Assert.Null(valueFromDictionary);             
         }
-
-
 
         [Fact]
         public void MoveToNonExisting()
@@ -46,8 +46,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.StringProperty = "A";
           
-
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Move("StringProperty", "AnotherStringProperty");
@@ -62,12 +60,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var cont = doc as IDictionary<string, object>;
             object valueFromDictionary;
             cont.TryGetValue("StringProperty", out valueFromDictionary);
-            Assert.Null(valueFromDictionary);
-             
+            Assert.Null(valueFromDictionary);             
         }
-
-
-
 
         [Fact]
         public void MoveDynamicToTyped()
@@ -75,9 +69,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.StringProperty = "A";        
             doc.SimpleDTO = new SimpleDTO() { AnotherStringProperty = "B" };
-
-
-
+            
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Move("StringProperty", "SimpleDTO/AnotherStringProperty");
@@ -92,10 +84,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var cont = doc as IDictionary<string, object>;
             object valueFromDictionary;
             cont.TryGetValue("StringProperty", out valueFromDictionary);
-            Assert.Null(valueFromDictionary);
-             
+            Assert.Null(valueFromDictionary);             
         }
-
 
         [Fact]
         public void MoveTypedToDynamic()
@@ -103,8 +93,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.StringProperty = "A";
             doc.SimpleDTO = new SimpleDTO() { AnotherStringProperty = "B" };
-
-
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -118,10 +106,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal("B", doc.StringProperty);
             Assert.Equal(null, doc.SimpleDTO.AnotherStringProperty);
         }
-
-
-
-
 
         [Fact]
         public void NestedMove()
@@ -146,17 +130,12 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(null, doc.Nested.StringProperty);
         }
 
-
-
-
-
         [Fact]
         public void MoveInList()
         {
             dynamic doc = new ExpandoObject();
             doc.IntegerList = new List<int>() { 1, 2, 3 };
            
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Move("IntegerList/0", "IntegerList/1");
@@ -168,7 +147,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 2, 1, 3 }, doc.IntegerList);
         }
-
 
         [Fact]
         public void NestedMoveInList()
@@ -191,8 +169,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 2, 1, 3 }, doc.Nested.IntegerList);
         }
 
-
-
         [Fact]
         public void MoveFromListToEndOfList()
         {
@@ -209,7 +185,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 2, 3, 1 }, doc.IntegerList);
         }
-
 
         [Fact]
         public void NestedMoveFromListToEndOfList()
@@ -231,8 +206,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 2, 3, 1 }, doc.Nested.IntegerList);
         }
 
-
-
         [Fact]
         public void MoveFomListToNonList()
         {
@@ -251,7 +224,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 2, 3 }, doc.IntegerList);
             Assert.Equal(1, doc.IntegerValue);
         }
-
 
         [Fact]
         public void NestedMoveFomListToNonList()
@@ -275,7 +247,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(1, doc.Nested.IntegerValue);
         }
 
-
         [Fact]
         public void MoveFromNonListToList()
         {
@@ -295,12 +266,10 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var cont = doc as IDictionary<string, object>;
             object valueFromDictionary;
             cont.TryGetValue("IntegerValue", out valueFromDictionary);
-            Assert.Null(valueFromDictionary);
-             
+            Assert.Null(valueFromDictionary);             
 
             Assert.Equal(new List<int>() { 5, 1, 2, 3 }, doc.IntegerList);
         }
-
 
         [Fact]
         public void NestedMoveFromNonListToList()
@@ -319,16 +288,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            deserialized.ApplyTo(doc);
- 
+            deserialized.ApplyTo(doc); 
 
             Assert.Equal(0, doc.Nested.IntegerValue);
             Assert.Equal(new List<int>() { 5, 1, 2, 3 }, doc.Nested.IntegerList);
         }
-
-
-
-
 
         [Fact]
         public void MoveToEndOfList()
@@ -336,7 +300,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             dynamic doc = new ExpandoObject();
             doc.IntegerValue = 5;
             doc.IntegerList = new List<int>() { 1, 2, 3 };
-
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
@@ -353,9 +316,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Null(valueFromDictionary);
              
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.IntegerList);
-
         }
-
         
         [Fact]
         public void NestedMoveToEndOfList()
@@ -378,7 +339,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(0, doc.Nested.IntegerValue);
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.Nested.IntegerList);
-
         }
     }
 }

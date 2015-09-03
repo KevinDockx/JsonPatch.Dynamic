@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Exceptions;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,7 +17,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
     public class AddTypedOperationTests
     {
 
-
         [Fact]
         public void AddToListNegativePosition()
         {
@@ -25,14 +29,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("IntegerList/-1", 4);
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
              
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
         }
-
 
         [Fact]
         public void AddToListInList()
@@ -48,11 +49,9 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 }
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("ListOfSimpleDTO/0/IntegerList/0", 4);
-
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -61,9 +60,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.ListOfSimpleDTO[0].IntegerList);
         }
-
-
-
+        
         [Fact]
         public void AddToListInListInvalidPositionTooSmall()
         {
@@ -78,17 +75,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 }
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("ListOfSimpleDTO/-1/IntegerList/0", 4);
-
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
         }
-
 
         [Fact]
         public void AddToListInListInvalidPositionTooLarge()
@@ -104,7 +98,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 }
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("ListOfSimpleDTO/20/IntegerList/0", 4);
@@ -115,6 +108,5 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
         }
-
     }
 }

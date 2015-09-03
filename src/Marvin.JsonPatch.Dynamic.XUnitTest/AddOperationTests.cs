@@ -1,4 +1,9 @@
-﻿using Marvin.JsonPatch.Dynamic;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Marvin.JsonPatch.Dynamic;
 using Marvin.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 using System;
@@ -13,12 +18,9 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class AddOperationTests
     {
-
-
         [Fact]
         public void AddNewPropertyShouldFailIfRootIsNotAnExpandoObject()
         {
-
             dynamic doc = new
             {
                 Test = 1
@@ -31,16 +33,18 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
- 
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/newint' could not be added.",
+                exception.Message); 
         }
-
-
 
         [Fact]
         public void AddNewProperty()
         {
-
             dynamic obj = new ExpandoObject();
             obj.Test = 1; 
 
@@ -50,22 +54,16 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
+            
             deserialized.ApplyTo(obj);
 
             Assert.Equal(1, obj.NewInt);
             Assert.Equal(1, obj.Test);
-
-
         }
-
-        
 
         [Fact]
         public void AddNewPropertyToNestedAnonymousObjectShouldFail()
         {
-
             dynamic doc = new
             {
                 Test = 1,
@@ -79,20 +77,20 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/nested/newint' could not be added.",
+                exception.Message); 
         }
-
-
-
+        
         [Fact]
         public void AddNewPropertyToTypedObjectShouldFail()
         {
-
             dynamic doc = new
             {
-
                 Test = 1,
                 nested = new NestedDTO()
             };
@@ -104,22 +102,20 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/nested/newint' could not be added.",
+                exception.Message);
         }
-
-         
-
-
 
         [Fact]
         public void AddToExistingPropertyOnNestedObject()
         {
-
-
             dynamic doc = new
             {
-
                 Test = 1,
                 nested = new NestedDTO()
             };
@@ -130,23 +126,18 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
+            
             deserialized.ApplyTo(doc);
 
             Assert.Equal("A", doc.nested.StringProperty);
             Assert.Equal(1, doc.Test);
-
         }
-
 
         [Fact]
         public void AddNewPropertyToExpandoOject()
         {
-
             dynamic doc = new
             {
-
                 Test = 1,
                 nested = new ExpandoObject()
             };
@@ -158,15 +149,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
             deserialized.ApplyTo(doc);
 
             Assert.Equal(1, doc.nested.NewInt);
             Assert.Equal(1, doc.Test);
         }
-
-
-
 
         [Fact]
         public void AddNewPropertyToExpandoOjectInTypedObject()
@@ -175,8 +162,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             {
                 DynamicProperty = new ExpandoObject()
             };
-
-
+            
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("DynamicProperty/NewInt", 1);
@@ -187,13 +173,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(1, doc.DynamicProperty.NewInt);
-
         }
-
-
- 
-
-
 
         [Fact]
         public void AddNewPropertyToTypedObjectInExpandoObject() 
@@ -206,7 +186,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
                 DynamicProperty = dynamicProperty
             };
 
-
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("DynamicProperty/StringProperty", "B");
@@ -217,15 +196,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal("B", doc.DynamicProperty.StringProperty);
-
         }
-
-
 
         [Fact]
         public void AddNewPropertyToAnonymousObjectShouldFail()
         {
-
             dynamic doc = new
             {
                 Test = 1
@@ -239,13 +214,17 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-             
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/nested/newint' could not be added.",
+                exception.Message);
 
-
-        }
-         
+            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); }); 
+        }         
 
         [Fact]
         public void AddResultsReplaceShouldFailOnAnonymousDueToNoSetter()
@@ -259,17 +238,17 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("StringProperty", "B");
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-    
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/nested/newint' could not be added.",
+                exception.Message);                 
         }
-
-
 
         [Fact]
         public void AddResultsShouldReplace()
@@ -281,16 +260,13 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("StringProperty", "B");
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             deserialized.ApplyTo(doc);
 
             Assert.Equal("B", doc.StringProperty);
-
         }
-
 
         [Fact]
         public void AddResultsShouldReplaceInNested()
@@ -304,16 +280,13 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("/InBetweenFirst/InBetweenSecond/StringProperty", "B");
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             deserialized.ApplyTo(doc);
 
             Assert.Equal("B", doc.InBetweenFirst.InBetweenSecond.StringProperty);
-
         }
-
 
         [Fact]
         public void AddResultsShouldReplaceInNestedInDynamic()
@@ -323,13 +296,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             doc.Nested.DynamicProperty = new ExpandoObject();
             doc.Nested.DynamicProperty.InBetweenFirst = new ExpandoObject();
             doc.Nested.DynamicProperty.InBetweenFirst.InBetweenSecond = new ExpandoObject();
-            doc.Nested.DynamicProperty.InBetweenFirst.InBetweenSecond.StringProperty = "A";
-           
+            doc.Nested.DynamicProperty.InBetweenFirst.InBetweenSecond.StringProperty = "A";           
 
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("/Nested/DynamicProperty/InBetweenFirst/InBetweenSecond/StringProperty", "B");
-
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
@@ -337,11 +308,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal("B", doc.Nested.DynamicProperty.InBetweenFirst.InBetweenSecond.StringProperty);
-
         }
-
-
-
 
         [Fact]
         public void ShouldNotBeAbleToAddToNonExistingPropertyThatIsNotTheRoot()
@@ -360,13 +327,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             //   the root of the document, nor a member of an existing object, nor a
             //   member of an existing array.
 
-
             var doc = new NestedDTO()
             {
                 DynamicProperty = new ExpandoObject()
             };
-
-
+            
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("DynamicProperty/OtherProperty/IntProperty", 1);
@@ -374,14 +339,15 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/dynamicproperty/otherproperty/intproperty' could not be added.",
+                exception.Message);
         }
-
-
-
-
+        
         [Fact]
         public void ShouldNotBeAbleToAddToNonExistingPropertyInNestedPropertyThatIsNotTheRoot()
         {
@@ -398,8 +364,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             //   because the "add" operation's target location that references neither
             //   the root of the document, nor a member of an existing object, nor a
             //   member of an existing array.
-
-
+            
             var doc = new
             {
                 Foo = "bar"
@@ -408,17 +373,18 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("baz/bat", "qux");
-
-
+            
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
-        }
-
-
+            
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/baz/bat' could not be added.",
+                exception.Message);             
+        }         
 
         [Fact]
         public void ShouldReplacePropertyWithDifferentCase()
@@ -430,18 +396,13 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("stringproperty", "B");
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
             deserialized.ApplyTo(doc);
 
             Assert.Equal("B", doc.StringProperty);
-
         }
-
-
-
 
         [Fact]
         public void AddToList()
@@ -454,17 +415,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("IntegerList/0", 4);
-
-
+            
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
+            
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
         }
-
 
         [Fact]
         public void AddToListNegativePosition()
@@ -475,19 +433,18 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             // create patch
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("IntegerList/-1", 4);
-
-
+            
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-             
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/integerlist/-1' could not be added.",
+                exception.Message);        
         }
-
-
-
-
 
         [Fact]
         public void ShouldAddToListWithDifferentCase()
@@ -501,18 +458,13 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             JsonPatchDocument patchDoc = new JsonPatchDocument();
             patchDoc.Add("integerlist/0", 4);
 
-
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
 
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
         }
-
-
-
 
         [Fact]
         public void AddToListInvalidPositionTooLarge()
@@ -528,14 +480,15 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
-
-
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
+            
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/integerlist/4' could not be added.",
+                exception.Message);
         }
-
-
-
-
 
         [Fact]
         public void AddToListAtEndWithSerialization()
@@ -555,12 +508,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2, 3, 4 }, doc.IntegerList);
-
         }
-
-
-
-
 
         [Fact]
         public void AddToListAtBeginning()
@@ -580,15 +528,11 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 4, 1, 2, 3 }, doc.IntegerList);
-
-
         }
-
 
         [Fact]
         public void AddToListInvalidPositionTooSmall()
         {
-
             var doc = new
             {
                 IntegerList = new List<int>() { 1, 2, 3 }
@@ -601,12 +545,14 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var serialized = JsonConvert.SerializeObject(patchDoc);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
 
-            Assert.Throws<JsonPatchException>(() => { deserialized.ApplyTo(doc); });
-
+            var exception = Assert.Throws<JsonPatchException>(() =>
+            {
+                deserialized.ApplyTo(doc);
+            });
+            Assert.Equal(
+                "The property at path '/integerlist/-1' could not be added.",
+                exception.Message);
         }
-
-
-
 
         [Fact]
         public void AddToListAppend()
@@ -626,8 +572,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 2, 3, 4 }, doc.IntegerList);
-
         }
-
     }
 }

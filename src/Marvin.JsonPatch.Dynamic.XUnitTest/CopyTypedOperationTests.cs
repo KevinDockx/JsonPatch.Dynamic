@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿// Any comments, input: @KevinDockx
+// Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
+//
+// Enjoy :-)
+
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +15,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 {
     public class CopyTypedOperationTests
     {
- 
-
         [Fact]
         public void Copy()
         {
@@ -30,10 +33,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal("A", doc.AnotherStringProperty);
-
         }
-
-
          
         [Fact]
         public void CopyInList()
@@ -53,10 +53,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 1, 1, 2, 3 }, doc.IntegerList);
-        }
-
-         
-
+        }       
 
         [Fact]
         public void CopyFromListToEndOfList()
@@ -76,9 +73,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 1, 2, 3, 1 }, doc.IntegerList);
         }
-
-
-         
 
         [Fact]
         public void CopyFromListToNonList()
@@ -100,8 +94,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(1, doc.IntegerValue);
         }
 
-
-
         [Fact]
         public void CopyFromNonListToList()
         {
@@ -122,10 +114,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 5, 1, 2, 3 }, doc.IntegerList);
         }
 
-
-         
-
-
         [Fact]
         public void CopyToEndOfList()
         {
@@ -144,13 +132,8 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             deserialized.ApplyTo(doc);
 
-
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.IntegerList);
-
         }
-
-
-         
 
         [Fact]
         public void NestedCopy()
@@ -174,10 +157,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal("A", doc.SimpleDTO.AnotherStringProperty);
-
         }
-
-         
 
         [Fact]
         public void NestedCopyInList()
@@ -200,8 +180,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 1, 1, 2, 3 }, doc.SimpleDTO.IntegerList);
         }
-
-
          
         [Fact]
         public void NestedCopyFromListToEndOfList()
@@ -226,10 +204,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 1, 2, 3, 1 }, doc.SimpleDTO.IntegerList);
         }
 
-
-
-
-
         [Fact]
         public void NestedCopyFromListToNonList()
         {
@@ -250,9 +224,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(1, doc.SimpleDTO.IntegerValue);
-        }
-
-         
+        }         
 
         [Fact]
         public void NestedCopyFromNonListToList()
@@ -276,8 +248,6 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             Assert.Equal(new List<int>() { 5, 1, 2, 3 }, doc.SimpleDTO.IntegerList);
         }
 
-         
-
         [Fact]
         public void NestedCopyToEndOfList()
         {
@@ -298,11 +268,7 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument>(serialized);
             deserialized.ApplyTo(doc);
 
-
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.SimpleDTO.IntegerList);
-
         }
-
-
     }
 }
