@@ -2,6 +2,7 @@
 // Any issues, requests: https://github.com/KevinDockx/JsonPatch.Dynamic
 //
 // Enjoy :-)
+
 using Newtonsoft.Json.Serialization;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers

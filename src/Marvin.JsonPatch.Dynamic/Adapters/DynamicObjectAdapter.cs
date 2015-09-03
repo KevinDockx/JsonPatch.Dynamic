@@ -578,31 +578,48 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
 
         public void Move(Operation operation, object objectToApplyTo)
         {
-            var valueAtFromLocation = GetValueAtLocation(operation.from, objectToApplyTo, operation);
+            var valueAtFromLocationResult = GetValueAtLocation(operation.from, objectToApplyTo, operation);
+
+            if (valueAtFromLocationResult.HasError)
+            {
+                // currently not applicable, will throw exception in GetValueAtLocation method
+            }
 
             // remove that value
             Remove(operation.from, objectToApplyTo, operation);
 
             // add that value to the path location
-            Add(operation.path, valueAtFromLocation, objectToApplyTo, operation);
+            Add(operation.path, 
+                valueAtFromLocationResult.PropertyValue, 
+                objectToApplyTo, 
+                operation);
         }
 
         public void Copy(Operation operation, object objectToApplyTo)
         {
             // get value at from location and add that value to the path location
-            Add(operation.path, GetValueAtLocation(operation.from, objectToApplyTo, operation)
-                , objectToApplyTo, operation);
+            var valueAtFromLocationResult = GetValueAtLocation(operation.from, objectToApplyTo, operation);
+
+            if (valueAtFromLocationResult.HasError)
+            {
+                // currently not applicable, will throw exception in GetValueAtLocation method
+            }
+
+            Add(operation.path, 
+                valueAtFromLocationResult.PropertyValue, 
+                objectToApplyTo, 
+                operation);
         }
 
-        private object GetValueAtLocation(string location, object objectToGetValueFrom, Operation operationToReport)
+        private GetValueResult GetValueAtLocation(string location, object objectToGetValueFrom, Operation operationToReport)
         {
             // get value from "objectToGetValueFrom" at location "location"
-            object valueAtLocation = null;
+           object valueAtLocation = null;
 
-            var pathResult = PropertyHelpers.GetActualPropertyPath(
-           location,
-           objectToGetValueFrom,
-           operationToReport, false);
+           var pathResult = PropertyHelpers.GetActualPropertyPath(
+               location,
+               objectToGetValueFrom,
+               operationToReport, false);
 
             var positionAsInteger = pathResult.NumericEnd;
             var actualFromProperty = pathResult.PathToProperty;
@@ -732,7 +749,7 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                                  .GetValue(patchProperty.Parent);
                 }
             }
-            return valueAtLocation;
+            return new GetValueResult(valueAtLocation, false);
         }
 
         public void Test(Operation operation, object objectToApplyTo)

@@ -52,6 +52,7 @@
     <Compile Include="Helpers\ActualPropertyPathResult.cs" />
     <Compile Include="Helpers\ConversionResult.cs" />
     <Compile Include="Helpers\ExpandoObjectDictionaryExtensions.cs" />
+    <Compile Include="Helpers\GetValueResult.cs" />
     <Compile Include="Helpers\JsonPatchProperty.cs" />
     <Compile Include="Helpers\ObjectTreeAnalysisResult.cs" />
     <Compile Include="Helpers\PathHelpers.cs" />
