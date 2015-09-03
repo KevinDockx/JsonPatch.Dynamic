@@ -549,7 +549,8 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             {
                 // return => currently not applicable, will throw exception in Remove method
             }
-            else if (!removeResult.HasError && removeResult.ActualType == null)
+
+            if (!removeResult.HasError && removeResult.ActualType == null)
             {
                 // the remove operation completed succesfully, but we could not determine the type.  
                 throw new JsonPatchException(
@@ -559,7 +560,6 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
                      string.Format("Patch failed: could not determine type of property at location {0}", operation.path)),
                    422); 
             }
-
 
             var conversionResult = PropertyHelpers.ConvertToActualType(removeResult.ActualType, operation.value);
 
@@ -586,7 +586,12 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             }
 
             // remove that value
-            Remove(operation.from, objectToApplyTo, operation);
+            var removeResult = Remove(operation.from, objectToApplyTo, operation);
+
+            if (removeResult.HasError)
+            {
+                // return => currently not applicable, will throw exception in Remove method
+            }
 
             // add that value to the path location
             Add(operation.path, 
