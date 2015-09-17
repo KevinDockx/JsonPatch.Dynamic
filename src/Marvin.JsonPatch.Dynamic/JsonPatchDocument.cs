@@ -67,7 +67,7 @@ namespace Marvin.JsonPatch.Dynamic
 
         public void ApplyTo<T>(T objectToApplyTo)
         {
-            ApplyTo(objectToApplyTo, new DynamicObjectAdapter());
+            ApplyTo(objectToApplyTo, new ObjectAdapter());
         } 
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Marvin.JsonPatch.Dynamic
         /// </summary>
         /// <param name="objectToApplyTo">The object to apply the JsonPatchDocument to</param>
         /// <param name="adapter">The IObjectAdapter instance to use</param>
-        public void ApplyTo<T>(T objectToApplyTo, IDynamicObjectAdapter adapter)
+        public void ApplyTo<T>(T objectToApplyTo, IObjectAdapter adapter)
         {
             // apply each operation in order
             foreach (var op in Operations)

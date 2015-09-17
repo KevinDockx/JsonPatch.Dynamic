@@ -11,7 +11,7 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
     /// versus when it actually is null (much like why RemovedPropertyTypeResult is used for returning 
     /// type in the Remove operation).
     /// </summary>
-    internal class GetValueResult
+    public class GetValueResult
     {
          /// <summary>
         /// The value of the property we're trying to get

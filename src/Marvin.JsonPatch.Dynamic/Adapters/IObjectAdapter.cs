@@ -6,7 +6,7 @@
 
 namespace Marvin.JsonPatch.Dynamic.Adapters
 {    
-    public interface IDynamicObjectAdapter
+    public interface IObjectAdapter
     {
         void Add(Marvin.JsonPatch.Operations.Operation operation, dynamic objectToApplyTo);        
         void Copy(Marvin.JsonPatch.Operations.Operation operation, dynamic objectToApplyTo);

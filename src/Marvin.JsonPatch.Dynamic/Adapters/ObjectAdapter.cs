@@ -13,10 +13,10 @@ using System.Reflection;
 
 namespace Marvin.JsonPatch.Dynamic.Adapters
 {
-    internal class DynamicObjectAdapter : IDynamicObjectAdapter
+    internal class ObjectAdapter : IObjectAdapter
     {
         public IContractResolver ContractResolver { get; private set; }
-        public DynamicObjectAdapter()
+        public ObjectAdapter()
         {
             ContractResolver = new DefaultContractResolver();
         }
