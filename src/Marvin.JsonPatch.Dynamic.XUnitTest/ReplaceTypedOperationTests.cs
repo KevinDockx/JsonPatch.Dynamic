@@ -89,7 +89,25 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             deserialized.ApplyTo(doc);
 
             Assert.Equal(new List<int>() { 5, 2, 3 }, doc.IntegerList);
-        }         
+        }
+
+
+        [Fact]
+        public void ReplaceInGenericList()
+        {
+            var doc = new SimpleDTO
+            {
+                IntegerGenericList = new List<int> { 1, 2, 3 }
+            };
+
+            // create patch
+            var patchDoc = new JsonPatchDocument<SimpleDTO>();
+            patchDoc.Replace(o => o.IntegerGenericList, 5, 0);
+
+            patchDoc.ApplyTo(doc);
+
+            Assert.Equal(new List<int> { 5, 2, 3 }, doc.IntegerGenericList);
+        }
 
         [Fact]
         public void ReplaceFullList()
@@ -253,6 +271,30 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
             {
                 deserialized.ApplyTo(doc);
             });
+        }
+
+        [Fact]
+        public void Replace()
+        {
+            var doc = new SimpleDTOWithNestedDTO()
+            {
+                SimpleDTO = new SimpleDTO()
+                {
+                    StringProperty = "A",
+                    DecimalValue = 10
+                }
+            };
+
+            // create patch
+            JsonPatchDocument<SimpleDTOWithNestedDTO> patchDoc =
+                new JsonPatchDocument<SimpleDTOWithNestedDTO>();
+            patchDoc.Replace<string>(o => o.SimpleDTO.StringProperty, "B");
+            patchDoc.Replace(o => o.SimpleDTO.DecimalValue, 12);
+
+            patchDoc.ApplyTo(doc);
+
+            Assert.Equal("B", doc.SimpleDTO.StringProperty);
+            Assert.Equal(12, doc.SimpleDTO.DecimalValue);
         }
     }
 }

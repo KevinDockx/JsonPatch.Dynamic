@@ -36,6 +36,24 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
         }
 
         [Fact]
+        public void AddToGenericList()
+        {
+            var doc = new SimpleDTO
+            {
+                IntegerGenericList = new List<int> { 1, 2, 3 }
+            };
+
+            // create patch
+            var patchDoc = new JsonPatchDocument<SimpleDTO>();
+            patchDoc.Add(o => o.IntegerGenericList, 4, 0);
+
+            patchDoc.ApplyTo(doc);
+
+            Assert.Equal(new List<int> { 4, 1, 2, 3 }, doc.IntegerGenericList);
+        }
+
+
+        [Fact]
         public void AddToListInList()
         {
             var doc = new SimpleDTOWithNestedDTO()

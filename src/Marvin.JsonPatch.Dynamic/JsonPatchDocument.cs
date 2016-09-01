@@ -22,17 +22,46 @@ namespace Marvin.JsonPatch.Dynamic
         [JsonIgnore]
         public IContractResolver ContractResolver { get; set; }
 
+        /// <summary>
+        /// Create a new JsonPatchDocument
+        /// </summary>
         public JsonPatchDocument()
         {
             Operations = new List<Operation>();
             ContractResolver = new DefaultContractResolver();
         }
-        
-        // Create from list of operations  
+
+        /// <summary>
+        /// Create a new JsonPatchDocument, and pass in a custom contract resolver
+        /// to use when applying the document.
+        /// </summary>
+        /// <param name="contractResolver">A custom IContractResolver</param>
+        public JsonPatchDocument(IContractResolver contractResolver)
+        {
+            Operations = new List<Operation>();
+            ContractResolver = contractResolver;
+        }
+
+        /// <summary>
+        /// Create a new JsonPatchDocument from a list of operations
+        /// </summary>
+        /// <param name="operations">A list of operations</param>
         public JsonPatchDocument(List<Operation> operations)
         {
             Operations = operations;
             ContractResolver = new DefaultContractResolver();
+        }
+
+        /// <summary>
+        /// Create a new JsonPatchDocument from a list of operations, and pass in a custom contract resolver 
+        /// to use when applying the document.
+        /// </summary>
+        /// <param name="operations">A list of operations</param>
+        /// <param name="contractResolver">A custom IContractResolver</param>
+        public JsonPatchDocument(List<Operation> operations, IContractResolver contractResolver)
+        {
+            Operations = operations;
+            ContractResolver = contractResolver;
         }
 
         public JsonPatchDocument Add(string path, object value)
@@ -67,7 +96,7 @@ namespace Marvin.JsonPatch.Dynamic
 
         public void ApplyTo<T>(T objectToApplyTo)
         {
-            ApplyTo(objectToApplyTo, new ObjectAdapter());
+            ApplyTo(objectToApplyTo, new ObjectAdapter(ContractResolver));
         } 
 
         /// <summary>

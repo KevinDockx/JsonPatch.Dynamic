@@ -222,5 +222,22 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 1, 2 }, doc.SimpleDTO.IntegerList);
         }
+
+        [Fact]
+        public void RemoveFromGenericList()
+        {
+            var doc = new SimpleDTO
+            {
+                IntegerGenericList = new List<int> { 1, 2, 3 }
+            };
+
+            // create patch
+            var patchDoc = new JsonPatchDocument<SimpleDTO>();
+            patchDoc.Remove(o => o.IntegerGenericList, 2);
+
+            patchDoc.ApplyTo(doc);
+
+            Assert.Equal(new List<int> { 1, 2 }, doc.IntegerGenericList);
+        }
     }
 }

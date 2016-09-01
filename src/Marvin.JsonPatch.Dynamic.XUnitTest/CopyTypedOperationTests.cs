@@ -270,5 +270,22 @@ namespace Marvin.JsonPatch.Dynamic.XUnitTest
 
             Assert.Equal(new List<int>() { 1, 2, 3, 5 }, doc.SimpleDTO.IntegerList);
         }
+
+        [Fact]
+        public void CopyInGenericList()
+        {
+            var doc = new SimpleDTO
+            {
+                IntegerGenericList = new List<int> { 1, 2, 3 }
+            };
+
+            // create patch
+            var patchDoc = new JsonPatchDocument<SimpleDTO>();
+            patchDoc.Copy(o => o.IntegerGenericList, 0, o => o.IntegerGenericList, 1);
+
+            patchDoc.ApplyTo(doc);
+
+            Assert.Equal(new List<int> { 1, 1, 2, 3 }, doc.IntegerGenericList);
+        }
     }
 }

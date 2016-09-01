@@ -21,6 +21,11 @@ namespace Marvin.JsonPatch.Dynamic.Adapters
             ContractResolver = new DefaultContractResolver();
         }
 
+        public ObjectAdapter(IContractResolver contractResolver)
+        {
+            ContractResolver = contractResolver;
+        }
+
         /// <summary>
         /// Add is used by various operations (eg: add, copy, ...), yet through different operations;
         /// This method allows code reuse yet reporting the correct operation on error

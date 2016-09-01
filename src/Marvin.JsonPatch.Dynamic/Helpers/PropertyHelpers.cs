@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
@@ -113,6 +114,6 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
                 return true;
             }
             return false;
-        }
+        } 
     }
 }
