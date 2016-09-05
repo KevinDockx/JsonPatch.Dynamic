@@ -63,8 +63,9 @@
     <Compile Include="AddTypedOperationTests.cs" />
     <Compile Include="CopyOperationTests.cs" />
     <Compile Include="CopyTypedOperationTests.cs" />
-    <Compile Include="JsonPatchPropertyTests.cs" />
+    <Compile Include="JsonPropertyTests.cs" />
     <Compile Include="JsonPropertyDTO.cs" />
+    <Compile Include="JsonPropertyWithAnotherNameDTO.cs" />
     <Compile Include="MoveOperationTests.cs" />
     <Compile Include="MoveTypedOperationTests.cs" />
     <Compile Include="NestedDTO.cs" />

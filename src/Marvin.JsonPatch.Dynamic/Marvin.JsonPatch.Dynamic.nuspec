@@ -14,7 +14,7 @@ Marvin.JsonPatch was built to work on staticly typed objects, which is great for
 
 That's what this component takes care of. It extends Marvin.JsonPatch with new methods on JsonPatchDocument, and it allows you to apply the JsonPatchDocument to dynamically typed objects.</description>
     <summary>Marvin.JsonPatch.Dynamic adds support for dynamically typed objects to Marvin.JsonPatch (Json Patch Document RFC 6902 implementation for .NET)</summary>
-    <copyright>Copyright 2015</copyright>
+    <copyright>Copyright 2016</copyright>
     <tags>Web API Dynamic WebAPI HttpPatch Json JsonPatch Partial Update ASP .NET</tags>
   </metadata>
 </package>
