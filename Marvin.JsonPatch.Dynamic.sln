@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic", "src\Marvin.JsonPatch.Dynamic\Marvin.JsonPatch.Dynamic.csproj", "{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic.XUnitTest", "test\Marvin.JsonPatch.Dynamic.XUnitTest\Marvin.JsonPatch.Dynamic.XUnitTest.csproj", "{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic.XUnitTest", "test\Marvin.JsonPatch.Dynamic.XUnitTest\Marvin.JsonPatch.Dynamic.XUnitTest.csproj", "{5E292FEB-38D6-40F4-B6BC-29F7F9AF255A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E292FEB-38D6-40F4-B6BC-29F7F9AF255A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E292FEB-38D6-40F4-B6BC-29F7F9AF255A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E292FEB-38D6-40F4-B6BC-29F7F9AF255A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E292FEB-38D6-40F4-B6BC-29F7F9AF255A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
