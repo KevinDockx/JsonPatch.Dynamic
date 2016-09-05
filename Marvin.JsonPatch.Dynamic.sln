@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic", "Marvin.JsonPatch.Dynamic\Marvin.JsonPatch.Dynamic.csproj", "{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic", "src\Marvin.JsonPatch.Dynamic\Marvin.JsonPatch.Dynamic.csproj", "{C8DC479F-2216-4B8F-BC26-23E88B6DA6D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic.XUnitTest", "Marvin.JsonPatch.Dynamic.XUnitTest\Marvin.JsonPatch.Dynamic.XUnitTest.csproj", "{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.JsonPatch.Dynamic.XUnitTest", "test\Marvin.JsonPatch.Dynamic.XUnitTest\Marvin.JsonPatch.Dynamic.XUnitTest.csproj", "{88ACAA9C-58D7-49C5-AEA2-1B65060EF582}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
