@@ -4,12 +4,14 @@
 // Enjoy :-)
 
 using Marvin.JsonPatch.Exceptions;
+using Marvin.JsonPatch.Helpers;
+using System;
 
 namespace Marvin.JsonPatch.Dynamic.Helpers
 {
     internal static class PathHelpers
     {
-        internal static string NormalizePath(string path)
+        internal static string NormalizePath(string path, CaseTransformType caseTransformType)
         {
             // check for most common path errors on create.  This is not
             // absolutely necessary, but it allows us to already catch mistakes
@@ -22,11 +24,28 @@ namespace Marvin.JsonPatch.Dynamic.Helpers
 
             if (!(path.StartsWith("/")))
             {
-                return "/" + path;
+                path = "/" + path;
             }
-            else
+
+            switch (caseTransformType)
             {
-                return path;
+                case CaseTransformType.LowerCase:
+                    return path.ToLowerInvariant();
+                case CaseTransformType.UpperCase:
+                    return path.ToUpperInvariant();
+                case CaseTransformType.CamelCase:
+                    if (path.Length > 1)
+                    {
+                        return "/" + Char.ToLowerInvariant(path[1]) + path.Substring(2);
+                    }
+                    else
+                    {
+                        return path;
+                    }
+                case CaseTransformType.OriginalCase:
+                    return path;
+                default:
+                    throw new NotImplementedException();                    
             }
         }
     }

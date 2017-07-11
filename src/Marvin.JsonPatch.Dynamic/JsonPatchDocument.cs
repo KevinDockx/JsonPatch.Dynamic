@@ -7,6 +7,7 @@ using Marvin.JsonPatch.Dynamic.Adapters;
 using Marvin.JsonPatch.Dynamic.Converters;
 using Marvin.JsonPatch.Dynamic.Helpers;
 using Marvin.JsonPatch.Dynamic.Operations;
+using Marvin.JsonPatch.Helpers;
 using Marvin.JsonPatch.Operations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -22,13 +23,16 @@ namespace Marvin.JsonPatch.Dynamic
         [JsonIgnore]
         public IContractResolver ContractResolver { get; set; }
 
+        [JsonIgnore]
+        public CaseTransformType CaseTransformType { get; set; }
+
+      
         /// <summary>
         /// Create a new JsonPatchDocument
         /// </summary>
-        public JsonPatchDocument()
+        public JsonPatchDocument() :
+            this(new List<Operation>(), new DefaultContractResolver(), CaseTransformType.OriginalCase)
         {
-            Operations = new List<Operation>();
-            ContractResolver = new DefaultContractResolver();
         }
 
         /// <summary>
@@ -37,9 +41,8 @@ namespace Marvin.JsonPatch.Dynamic
         /// </summary>
         /// <param name="contractResolver">A custom IContractResolver</param>
         public JsonPatchDocument(IContractResolver contractResolver)
+            : this(new List<Operation>(), contractResolver, CaseTransformType.OriginalCase)
         {
-            Operations = new List<Operation>();
-            ContractResolver = contractResolver;
         }
 
         /// <summary>
@@ -47,9 +50,38 @@ namespace Marvin.JsonPatch.Dynamic
         /// </summary>
         /// <param name="operations">A list of operations</param>
         public JsonPatchDocument(List<Operation> operations)
+            : this(operations, new DefaultContractResolver(), CaseTransformType.OriginalCase)
         {
-            Operations = operations;
-            ContractResolver = new DefaultContractResolver();
+        }
+
+        /// <summary>
+        /// Create a new JsonPatchDocument and pass in a CaseTransformType
+        /// </summary>
+        /// <param name="caseTransformType">Defines the case used when seralizing the object to JSON</param>
+        public JsonPatchDocument(CaseTransformType caseTransformType)
+            : this(new List<Operation>(), new DefaultContractResolver(), caseTransformType)
+        {
+        }
+
+        /// <summary>
+        /// Create a new JsonPatchDocument from a list of operations and pass in a CaseTransformType
+        /// </summary>
+        /// <param name="operations">A list of operations</param>
+        /// <param name="caseTransformType">Defines the case used when seralizing the object to JSON</param>
+        public JsonPatchDocument(List<Operation> operations, CaseTransformType caseTransformType)
+            : this(operations, new DefaultContractResolver(), caseTransformType)
+        {
+        }
+
+        /// <summary>
+        /// Create a new JsonPatchDocument, and pass in a CaseTransformType and
+        /// custom contract resolver to use when applying the document.
+        /// </summary>
+        /// <param name="contractResolver">A custom IContractResolver</param>
+        /// <param name="caseTransformType">Defines the case used when seralizing the object to JSON</param>
+        public JsonPatchDocument(IContractResolver contractResolver, CaseTransformType caseTransformType)
+            : this(new List<Operation>(), contractResolver, caseTransformType)
+        {
         }
 
         /// <summary>
@@ -59,38 +91,44 @@ namespace Marvin.JsonPatch.Dynamic
         /// <param name="operations">A list of operations</param>
         /// <param name="contractResolver">A custom IContractResolver</param>
         public JsonPatchDocument(List<Operation> operations, IContractResolver contractResolver)
+            : this(operations, contractResolver, CaseTransformType.OriginalCase)
+        {
+        }
+
+        public JsonPatchDocument(List<Operation> operations, IContractResolver contractResolver, CaseTransformType caseTransformType)
         {
             Operations = operations;
             ContractResolver = contractResolver;
+            CaseTransformType = caseTransformType;
         }
 
         public JsonPatchDocument Add(string path, object value)
         {
-            Operations.Add(new Operation("add", PathHelpers.NormalizePath(path), null, value));
+            Operations.Add(new Operation("add", PathHelpers.NormalizePath(path, CaseTransformType), null, value));
             return this;
         }
           
         public JsonPatchDocument Remove(string path)
         {
-            Operations.Add(new Operation("remove", PathHelpers.NormalizePath(path), null, null));
+            Operations.Add(new Operation("remove", PathHelpers.NormalizePath(path, CaseTransformType), null, null));
             return this;
         }
 
         public JsonPatchDocument Replace(string path, object value)
         {
-            Operations.Add(new Operation("replace", PathHelpers.NormalizePath(path), null, value));
+            Operations.Add(new Operation("replace", PathHelpers.NormalizePath(path, CaseTransformType), null, value));
             return this;
         }
    
         public JsonPatchDocument Move(string from, string path)
         {
-            Operations.Add(new Operation("move", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
+            Operations.Add(new Operation("move", PathHelpers.NormalizePath(path, CaseTransformType), PathHelpers.NormalizePath(from, CaseTransformType)));
             return this;
         }
                  
         public JsonPatchDocument Copy(string from, string path)
         {
-            Operations.Add(new Operation("copy", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
+            Operations.Add(new Operation("copy", PathHelpers.NormalizePath(path, CaseTransformType), PathHelpers.NormalizePath(from, CaseTransformType)));
             return this;
         } 
 
